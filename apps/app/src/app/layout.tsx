@@ -14,6 +14,8 @@ import { headers } from 'next/headers';
 import { NuqsAdapter } from 'nuqs/adapters/next/app';
 import { Toaster } from 'sonner';
 import { Providers } from './providers';
+import { getLocale } from "gt-next/server";
+import { GTProvider } from "gt-next";
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -26,17 +28,17 @@ export const metadata: Metadata = {
     title: 'Comp AI | Automate SOC 2, ISO 27001 and GDPR compliance with AI.',
     description: 'Automate SOC 2, ISO 27001 and GDPR compliance with AI.',
     images: [
-      {
-        url: 'https://cdn.trycomp.ai/opengraph-image.jpg',
-        width: 800,
-        height: 600,
-      },
-      {
-        url: 'https://cdn.trycomp.ai/opengraph-image.jpg',
-        width: 1800,
-        height: 1600,
-      },
-    ],
+    {
+      url: 'https://cdn.trycomp.ai/opengraph-image.jpg',
+      width: 800,
+      height: 600
+    },
+    {
+      url: 'https://cdn.trycomp.ai/opengraph-image.jpg',
+      width: 1800,
+      height: 1600
+    }]
+
   },
   openGraph: {
     title: 'Comp AI | Automate SOC 2, ISO 27001 and GDPR compliance with AI.',
@@ -44,20 +46,20 @@ export const metadata: Metadata = {
     url: 'https://app.trycomp.ai',
     siteName: 'Comp AI',
     images: [
-      {
-        url: 'https://cdn.trycomp.ai/opengraph-image.jpg',
-        width: 800,
-        height: 600,
-      },
-      {
-        url: 'https://cdn.trycomp.ai/opengraph-image.jpg',
-        width: 1800,
-        height: 1600,
-      },
-    ],
+    {
+      url: 'https://cdn.trycomp.ai/opengraph-image.jpg',
+      width: 800,
+      height: 600
+    },
+    {
+      url: 'https://cdn.trycomp.ai/opengraph-image.jpg',
+      width: 1800,
+      height: 1600
+    }],
+
     locale: 'en_US',
-    type: 'website',
-  },
+    type: 'website'
+  }
 };
 
 export const viewport = {
@@ -66,46 +68,46 @@ export const viewport = {
   maximumScale: 1,
   userScalable: false,
   themeColor: [
-    { media: '(prefers-color-scheme: light)' },
-    { media: '(prefers-color-scheme: dark)' },
-  ],
+  { media: '(prefers-color-scheme: light)' },
+  { media: '(prefers-color-scheme: dark)' }]
+
 };
 
 const font = localFont({
   src: '/../../public/fonts/GeneralSans-Variable.ttf',
   display: 'swap',
-  variable: '--font-general-sans',
+  variable: '--font-general-sans'
 });
 
 export const preferredRegion = ['auto'];
 
-export default async function Layout({ children }: { children: React.ReactNode }) {
+export default async function Layout({ children }: {children: React.ReactNode;}) {
   const session = await auth.api.getSession({
-    headers: await headers(),
+    headers: await headers()
   });
 
   const dubIsEnabled = env.DUB_API_KEY !== undefined;
   const dubReferUrl = env.DUB_REFER_URL;
 
   return (
-    <html lang="en" suppressHydrationWarning>
+  <html suppressHydrationWarning lang={await getLocale()}>
       <head>
         {dubIsEnabled && dubReferUrl && (
-          <DubAnalytics
-            domainsConfig={{
-              refer: dubReferUrl,
-            }}
-          />
-        )}
+      <DubAnalytics
+        domainsConfig={{
+          refer: dubReferUrl
+        }} />
+
+      )}
       </head>
       <body
-        className={cn(
-          `${GeistMono.variable} ${font.variable}`,
-          'overscroll-none whitespace-pre-line antialiased',
-        )}
-      >
+      className={cn(
+        `${GeistMono.variable} ${font.variable}`,
+        'overscroll-none whitespace-pre-line antialiased'
+      )}><GTProvider>
+
         {env.NEXT_PUBLIC_LINKEDIN_PARTNER_ID && (
-          <LinkedInInsight partnerId={env.NEXT_PUBLIC_LINKEDIN_PARTNER_ID} />
+        <LinkedInInsight partnerId={env.NEXT_PUBLIC_LINKEDIN_PARTNER_ID} />
         )}
         <NuqsAdapter>
           <Providers session={session}>
@@ -114,7 +116,7 @@ export default async function Layout({ children }: { children: React.ReactNode }
         </NuqsAdapter>
         <Toaster richColors />
         <VercelAnalytics />
-      </body>
+      </GTProvider></body>
     </html>
   );
 }
