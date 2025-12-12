@@ -3,6 +3,7 @@
 import { encrypt } from '@/lib/encryption';
 import { getIntegrationHandler } from '@comp/integrations';
 import { db } from '@db';
+import { getGT } from 'gt-next/server';
 import { revalidatePath } from 'next/cache';
 import { cookies, headers } from 'next/headers';
 import { z } from 'zod';
@@ -24,11 +25,12 @@ export const connectCloudAction = authActionClient
     },
   })
   .action(async ({ parsedInput: { cloudProvider, credentials }, ctx: { session } }) => {
+    const gt = await getGT();
     try {
       if (!session.activeOrganizationId) {
         return {
           success: false,
-          error: 'No active organization found',
+          error: gt('No active organization found'),
         };
       }
 
@@ -38,7 +40,7 @@ export const connectCloudAction = authActionClient
         if (!integrationHandler) {
           return {
             success: false,
-            error: 'Integration handler not found',
+            error: gt('Integration handler not found'),
           };
         }
 
@@ -56,8 +58,8 @@ export const connectCloudAction = authActionClient
           success: false,
           error:
             error instanceof Error
-              ? `Invalid credentials: ${error.message}`
-              : 'Failed to validate credentials. Please check your credentials and try again.',
+              ? gt('Invalid credentials: {message}', { message: error.message })
+              : gt('Failed to validate credentials. Please check your credentials and try again.'),
         };
       }
 
@@ -126,7 +128,7 @@ export const connectCloudAction = authActionClient
       console.error('Failed to connect cloud provider:', error);
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Failed to connect cloud provider',
+        error: error instanceof Error ? error.message : gt('Failed to connect cloud provider'),
       };
     }
   });

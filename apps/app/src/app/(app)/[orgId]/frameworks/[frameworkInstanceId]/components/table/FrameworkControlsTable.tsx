@@ -9,12 +9,14 @@ import {
   type OrganizationControlType,
 } from './FrameworkControlsTableColumns';
 import { FrameworkControlsTableHeader } from './FrameworkControlsTableHeader';
+import { useGT } from 'gt-next';
 
 interface DataTableProps {
   data: OrganizationControlType[];
 }
 
 export function FrameworkControlsTable({ data }: DataTableProps) {
+  const gt = useGT();
   const columns = FrameworkControlsTableColumns();
 
   const table = useReactTable({
@@ -46,7 +48,7 @@ export function FrameworkControlsTable({ data }: DataTableProps) {
             ) : (
               <TableRow>
                 <TableCell colSpan={columns.length} className="h-24 text-center">
-                  No controls found.
+                  {gt('No controls found.')}
                 </TableCell>
               </TableRow>
             )}

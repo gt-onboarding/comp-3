@@ -6,6 +6,7 @@ import { revalidatePath } from 'next/cache';
 import { headers } from 'next/headers';
 import { z } from 'zod';
 import { authActionClient } from '../../../../../actions/safe-action';
+import { getGT } from 'gt-next/server';
 
 const updateCloudCredentialsSchema = z.object({
   cloudProvider: z.enum(['aws', 'gcp', 'azure']),
@@ -22,11 +23,12 @@ export const updateCloudCredentialsAction = authActionClient
     },
   })
   .action(async ({ parsedInput: { cloudProvider, credentials }, ctx: { session } }) => {
+    const gt = await getGT();
     try {
       if (!session.activeOrganizationId) {
         return {
           success: false,
-          error: 'No active organization found',
+          error: gt('No active organization found'),
         };
       }
 
@@ -41,7 +43,7 @@ export const updateCloudCredentialsAction = authActionClient
       if (!integration) {
         return {
           success: false,
-          error: 'Cloud provider not found',
+          error: gt('Cloud provider not found'),
         };
       }
 
@@ -74,7 +76,7 @@ export const updateCloudCredentialsAction = authActionClient
       console.error('Failed to update cloud credentials:', error);
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Failed to update cloud credentials',
+        error: error instanceof Error ? error.message : gt('Failed to update cloud credentials'),
       };
     }
   });

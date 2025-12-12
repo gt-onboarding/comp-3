@@ -5,6 +5,7 @@ import * as React from 'react';
 import { DataTable } from '@/components/data-table/data-table';
 import { DataTableToolbar } from '@/components/data-table/data-table-toolbar';
 import { useDataTable } from '@/hooks/use-data-table';
+import { useGT } from 'gt-next';
 import { useParams } from 'next/navigation';
 import { ControlWithRelations } from '../data/queries';
 import { getControlColumns } from './controls-table-columns';
@@ -26,7 +27,8 @@ interface ControlsTableProps {
 export function ControlsTable({ promises, policies, tasks, requirements }: ControlsTableProps) {
   const [{ data, pageCount }] = React.use(promises);
   const { orgId } = useParams();
-  const columns = React.useMemo(() => getControlColumns(), []);
+  const gt = useGT();
+  const columns = React.useMemo(() => getControlColumns(gt), [gt]);
   const [filteredData, setFilteredData] = React.useState<ControlWithRelations[]>(data);
 
   // For client-side filtering, we don't need to apply server-side filtering
@@ -45,7 +47,7 @@ export function ControlsTable({ promises, policies, tasks, requirements }: Contr
   return (
     <>
       <DataTable table={table} getRowId={(row) => row.id} rowClickBasePath={`/${orgId}/controls`}>
-        <DataTableToolbar table={table} sheet="create-control" action="Create Control" />
+        <DataTableToolbar table={table} sheet="create-control" action={gt('Create Control')} />
       </DataTable>
       <CreateControlSheet policies={policies} tasks={tasks} requirements={requirements} />
     </>

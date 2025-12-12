@@ -3,6 +3,7 @@ import { db } from '@db';
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { cache } from 'react';
+import { getGT } from 'gt-next/server';
 import { Overview } from './components/Overview';
 import { getAllFrameworkInstancesWithControls } from './data/getAllFrameworkInstancesWithControls';
 import { getFrameworkWithComplianceScores } from './data/getFrameworkWithComplianceScores';
@@ -11,8 +12,9 @@ import { getPublishedPoliciesScore } from './lib/getPolicies';
 import { getDoneTasks } from './lib/getTasks';
 
 export async function generateMetadata() {
+  const gt = await getGT();
   return {
-    title: 'Frameworks',
+    title: gt('Frameworks'),
   };
 }
 

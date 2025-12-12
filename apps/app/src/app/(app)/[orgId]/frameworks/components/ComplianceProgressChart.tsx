@@ -11,6 +11,7 @@ import {
   ChartTooltipContent,
 } from '@comp/ui/chart';
 import { Info } from 'lucide-react';
+import { T, useGT } from 'gt-next';
 
 interface ComplianceProgressData {
   score: number;
@@ -27,31 +28,34 @@ const CHART_COLORS = {
 };
 
 export function ComplianceProgressChart({ data }: ComplianceProgressChartProps) {
+  const gt = useGT();
   const chartData = React.useMemo(() => {
     if (!data) return [];
     const items = [
       {
-        name: 'Completed',
+        name: gt('Completed'),
         value: data.score,
         text: `${data.score}%`,
         fill: CHART_COLORS.score,
       },
       {
-        name: 'Remaining',
+        name: gt('Remaining'),
         value: data.remaining,
         text: `${data.remaining} / 100%`,
         fill: CHART_COLORS.remaining,
       },
     ];
     return items.filter((item) => item.value > 0);
-  }, [data]);
+  }, [data, gt]);
 
   if (!data) {
     return (
       <Card className="flex flex-col overflow-hidden border">
         <CardHeader className="pb-2">
           <div className="flex items-center justify-between">
-            <CardTitle className="flex items-center gap-2">Compliance Progress</CardTitle>
+            <T>
+              <CardTitle className="flex items-center gap-2">Compliance Progress</CardTitle>
+            </T>
           </div>
         </CardHeader>
         <CardContent className="flex flex-1 items-center justify-center py-10">
@@ -59,7 +63,9 @@ export function ComplianceProgressChart({ data }: ComplianceProgressChartProps) 
             <div className="text-muted-foreground flex justify-center">
               <Info className="h-10 w-10 opacity-30" />
             </div>
-            <p className="text-muted-foreground text-center text-sm">No data available</p>
+            <T>
+              <p className="text-muted-foreground text-center text-sm">No data available</p>
+            </T>
           </div>
         </CardContent>
       </Card>
@@ -68,7 +74,7 @@ export function ComplianceProgressChart({ data }: ComplianceProgressChartProps) 
 
   const chartConfig = {
     value: {
-      label: 'Overall Progress',
+      label: gt('Overall Progress'),
     },
   } satisfies ChartConfig;
 
@@ -120,7 +126,7 @@ export function ComplianceProgressChart({ data }: ComplianceProgressChartProps) 
                         y={(viewBox.cy || 0) + 18}
                         className="fill-muted-foreground text-[9px] select-none"
                       >
-                        Overall
+                        {gt('Overall')}
                       </tspan>
                     </text>
                     <circle

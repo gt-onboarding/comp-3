@@ -3,6 +3,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@comp/ui/card';
 import { Progress } from '@comp/ui/progress';
 import { FrameworkInstance } from '@db';
+import { T } from 'gt-next';
 import { ComplianceProgressChart } from './ComplianceProgressChart';
 import { PeopleChart } from './PeopleChart';
 import { PoliciesChart } from './PoliciesChart';
@@ -42,7 +43,9 @@ export function ComplianceOverview({
     <Card className="flex flex-col overflow-hidden border h-full">
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
-          <CardTitle className="flex items-center gap-2">{'Overall Compliance Progress'}</CardTitle>
+          <CardTitle className="flex items-center gap-2">
+            <T>Overall Compliance Progress</T>
+          </CardTitle>
         </div>
 
         <div className="bg-secondary/50 relative mt-2 h-1 w-full overflow-hidden rounded-full">
@@ -62,7 +65,9 @@ export function ComplianceOverview({
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div className="h-2 w-2 rounded-full bg-primary"></div>
-                <span className="text-sm">Overall Compliance</span>
+                <T>
+                  <span className="text-sm">Overall Compliance</span>
+                </T>
               </div>
               <span className="font-medium text-sm tabular-nums">{compliancePercentage}%</span>
             </div>
@@ -74,7 +79,9 @@ export function ComplianceOverview({
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div className="h-2 w-2 rounded-full bg-blue-500"></div>
-                <span className="text-sm">Policies Published</span>
+                <T>
+                  <span className="text-sm">Policies Published</span>
+                </T>
               </div>
               <span className="font-medium text-sm tabular-nums">{policiesPercentage}%</span>
             </div>
@@ -86,7 +93,9 @@ export function ComplianceOverview({
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div className="h-2 w-2 rounded-full bg-yellow-500"></div>
-                <span className="text-sm">Tasks Completed</span>
+                <T>
+                  <span className="text-sm">Tasks Completed</span>
+                </T>
               </div>
               <span className="font-medium text-sm tabular-nums">{tasksPercentage}%</span>
             </div>
@@ -98,7 +107,9 @@ export function ComplianceOverview({
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div className="h-2 w-2 rounded-full bg-green-500"></div>
-                <span className="text-sm">People Score</span>
+                <T>
+                  <span className="text-sm">People Score</span>
+                </T>
               </div>
               <span className="font-medium text-sm tabular-nums">{peoplePercentage}%</span>
             </div>

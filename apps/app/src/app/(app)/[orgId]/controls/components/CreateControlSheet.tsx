@@ -10,6 +10,7 @@ import MultipleSelector, { Option } from '@comp/ui/multiple-selector';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@comp/ui/sheet';
 import { Textarea } from '@comp/ui/textarea';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { T, useGT } from 'gt-next';
 import { ArrowRightIcon, X } from 'lucide-react';
 import { useAction } from 'next-safe-action/hooks';
 import { useQueryState } from 'nuqs';
@@ -18,24 +19,25 @@ import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod';
 
-const createControlSchema = z.object({
-  name: z.string().min(1, {
-    message: 'Name is required',
-  }),
-  description: z.string().min(1, {
-    message: 'Description is required',
-  }),
-  policyIds: z.array(z.string()).optional(),
-  taskIds: z.array(z.string()).optional(),
-  requirementMappings: z
-    .array(
-      z.object({
-        requirementId: z.string(),
-        frameworkInstanceId: z.string(),
-      }),
-    )
-    .optional(),
-});
+const createControlSchema = (gt: (key: string) => string) =>
+  z.object({
+    name: z.string().min(1, {
+      message: gt('Name is required'),
+    }),
+    description: z.string().min(1, {
+      message: gt('Description is required'),
+    }),
+    policyIds: z.array(z.string()).optional(),
+    taskIds: z.array(z.string()).optional(),
+    requirementMappings: z
+      .array(
+        z.object({
+          requirementId: z.string(),
+          frameworkInstanceId: z.string(),
+        }),
+      )
+      .optional(),
+  });
 
 export function CreateControlSheet({
   policies,
@@ -52,6 +54,7 @@ export function CreateControlSheet({
     frameworkName: string;
   }[];
 }) {
+  const gt = useGT();
   const isDesktop = useMediaQuery('(min-width: 768px)');
   const [createControlOpen, setCreateControlOpen] = useQueryState('create-control');
   const isOpen = Boolean(createControlOpen);
@@ -62,17 +65,17 @@ export function CreateControlSheet({
 
   const createControl = useAction(createControlAction, {
     onSuccess: () => {
-      toast.success('Control created successfully');
+      toast.success(gt('Control created successfully'));
       setCreateControlOpen(null);
       form.reset();
     },
     onError: (error) => {
-      toast.error(error.error?.serverError || 'Failed to create control');
+      toast.error(error.error?.serverError || gt('Failed to create control'));
     },
   });
 
-  const form = useForm<z.infer<typeof createControlSchema>>({
-    resolver: zodResolver(createControlSchema),
+  const form = useForm<z.infer<ReturnType<typeof createControlSchema>>>({
+    resolver: zodResolver(createControlSchema(gt)),
     defaultValues: {
       name: '',
       description: '',
@@ -83,7 +86,7 @@ export function CreateControlSheet({
   });
 
   const onSubmit = useCallback(
-    (data: z.infer<typeof createControlSchema>) => {
+    (data: z.infer<ReturnType<typeof createControlSchema>>) => {
       createControl.execute(data);
     },
     [createControl],
@@ -176,11 +179,11 @@ export function CreateControlSheet({
           name="name"
           render={({ field }) => (
             <FormItem className="w-full">
-              <FormLabel>Control Name</FormLabel>
+              <FormLabel>{gt('Control Name')}</FormLabel>
               <FormControl>
                 <Input
                   {...field}
-                  placeholder="A descriptive name for the control"
+                  placeholder={gt('A descriptive name for the control')}
                   autoCorrect="off"
                   className="w-full"
                 />
@@ -195,12 +198,12 @@ export function CreateControlSheet({
           name="description"
           render={({ field }) => (
             <FormItem className="w-full">
-              <FormLabel>Description</FormLabel>
+              <FormLabel>{gt('Description')}</FormLabel>
               <FormControl>
                 <Textarea
                   {...field}
                   className="min-h-[80px] w-full resize-none"
-                  placeholder="Provide a detailed description of the control"
+                  placeholder={gt('Provide a detailed description of the control')}
                 />
               </FormControl>
               <FormMessage />
@@ -221,18 +224,20 @@ export function CreateControlSheet({
 
             return (
               <FormItem className="w-full">
-                <FormLabel>Policies (Optional)</FormLabel>
+                <FormLabel>{gt('Policies (Optional)')}</FormLabel>
                 <FormControl>
                   <div className="relative overflow-visible">
                     <MultipleSelector
                       value={selectedOptions}
                       onChange={(options) => handlePoliciesChange(options, field.onChange)}
                       defaultOptions={policyOptions}
-                      placeholder="Search and select policies..."
+                      placeholder={gt('Search and select policies...')}
                       emptyIndicator={
-                        <p className="text-center text-lg leading-10 text-muted-foreground">
-                          No policies found.
-                        </p>
+                        <T>
+                          <p className="text-center text-lg leading-10 text-muted-foreground">
+                            No policies found.
+                          </p>
+                        </T>
                       }
                       className="[&_[cmdk-list]]:!z-[9999] [&_[cmdk-list]]:!fixed"
                       commandProps={{
@@ -260,18 +265,20 @@ export function CreateControlSheet({
 
             return (
               <FormItem className="w-full">
-                <FormLabel>Tasks (Optional)</FormLabel>
+                <FormLabel>{gt('Tasks (Optional)')}</FormLabel>
                 <FormControl>
                   <div className="relative overflow-visible">
                     <MultipleSelector
                       value={selectedOptions}
                       onChange={(options) => handleTasksChange(options, field.onChange)}
                       defaultOptions={taskOptions}
-                      placeholder="Search and select tasks..."
+                      placeholder={gt('Search and select tasks...')}
                       emptyIndicator={
-                        <p className="text-center text-lg leading-10 text-muted-foreground">
-                          No tasks found.
-                        </p>
+                        <T>
+                          <p className="text-center text-lg leading-10 text-muted-foreground">
+                            No tasks found.
+                          </p>
+                        </T>
                       }
                       className="[&_[cmdk-list]]:!z-[9999] [&_[cmdk-list]]:!fixed"
                       commandProps={{
@@ -307,7 +314,7 @@ export function CreateControlSheet({
 
             return (
               <FormItem className="w-full">
-                <FormLabel>Requirements (Optional)</FormLabel>
+                <FormLabel>{gt('Requirements (Optional)')}</FormLabel>
                 <FormControl>
                   <div className="relative overflow-visible">
                     <MultipleSelector
@@ -321,11 +328,13 @@ export function CreateControlSheet({
                       defaultOptions={
                         requirementOptions as (Option & { frameworkInstanceId?: string })[]
                       }
-                      placeholder="Search and select requirements..."
+                      placeholder={gt('Search and select requirements...')}
                       emptyIndicator={
-                        <p className="text-center text-lg leading-10 text-muted-foreground">
-                          No requirements found.
-                        </p>
+                        <T>
+                          <p className="text-center text-lg leading-10 text-muted-foreground">
+                            No requirements found.
+                          </p>
+                        </T>
                       }
                       className="[&_[cmdk-list]]:!z-[9999] [&_[cmdk-list]]:!fixed"
                       commandProps={{
@@ -349,7 +358,7 @@ export function CreateControlSheet({
         <Sheet open={isOpen} onOpenChange={handleOpenChange}>
           <SheetContent stack className="flex flex-col h-full">
             <SheetHeader className="mb-6 flex flex-row items-center justify-between flex-shrink-0">
-              <SheetTitle>Create New Control</SheetTitle>
+              <SheetTitle>{gt('Create New Control')}</SheetTitle>
               <Button
                 size="icon"
                 variant="ghost"
@@ -372,7 +381,7 @@ export function CreateControlSheet({
                 onClick={form.handleSubmit(onSubmit)}
               >
                 <div className="flex items-center justify-center">
-                  Create Control
+                  {gt('Create Control')}
                   <ArrowRightIcon className="ml-2 h-4 w-4" />
                 </div>
               </Button>
@@ -385,7 +394,7 @@ export function CreateControlSheet({
 
   return (
     <Drawer open={isOpen} onOpenChange={handleOpenChange}>
-      <DrawerTitle hidden>Create New Control</DrawerTitle>
+      <DrawerTitle hidden>{gt('Create New Control')}</DrawerTitle>
       <DrawerContent className="flex flex-col h-full max-h-[80vh]">
         <div className="flex-1 overflow-y-auto p-6 pb-0">
           <div className="w-full pb-6">{controlForm}</div>
@@ -399,7 +408,7 @@ export function CreateControlSheet({
             onClick={form.handleSubmit(onSubmit)}
           >
             <div className="flex items-center justify-center">
-              Create Control
+              {gt('Create Control')}
               <ArrowRightIcon className="ml-2 h-4 w-4" />
             </div>
           </Button>

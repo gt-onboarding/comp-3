@@ -11,6 +11,7 @@ import {
   ChartTooltipContent,
 } from '@comp/ui/chart';
 import { Info } from 'lucide-react';
+import { T, useGT } from 'gt-next';
 
 interface PeopleChartData {
   completed: number;
@@ -27,29 +28,32 @@ const CHART_COLORS = {
 };
 
 export function PeopleChart({ data }: PeopleChartProps) {
+  const gt = useGT();
   const chartData = React.useMemo(() => {
     if (!data) return [];
     const items = [
       {
-        name: 'Compliant',
+        name: gt('Compliant'),
         value: data.completed,
         fill: CHART_COLORS.completed,
       },
       {
-        name: 'Remaining',
+        name: gt('Remaining'),
         value: data.remaining,
         fill: CHART_COLORS.remaining,
       },
     ];
     return items.filter((item) => item.value > 0);
-  }, [data]);
+  }, [data, gt]);
 
   if (!data) {
     return (
       <Card className="flex flex-col overflow-hidden border">
         <CardHeader className="pb-2">
           <div className="flex items-center justify-between">
-            <CardTitle className="flex items-center gap-2">People</CardTitle>
+            <T>
+              <CardTitle className="flex items-center gap-2">People</CardTitle>
+            </T>
           </div>
         </CardHeader>
         <CardContent className="flex flex-1 items-center justify-center py-10">
@@ -57,7 +61,9 @@ export function PeopleChart({ data }: PeopleChartProps) {
             <div className="text-muted-foreground flex justify-center">
               <Info className="h-10 w-10 opacity-30" />
             </div>
-            <p className="text-muted-foreground text-center text-sm">No data available</p>
+            <T>
+              <p className="text-muted-foreground text-center text-sm">No data available</p>
+            </T>
           </div>
         </CardContent>
       </Card>
@@ -66,7 +72,7 @@ export function PeopleChart({ data }: PeopleChartProps) {
 
   const chartConfig = {
     value: {
-      label: 'People Status',
+      label: gt('People Status'),
     },
   } satisfies ChartConfig;
 
@@ -118,7 +124,7 @@ export function PeopleChart({ data }: PeopleChartProps) {
                         y={(viewBox.cy || 0) + 18}
                         className="fill-muted-foreground text-[9px] select-none"
                       >
-                        People
+                        {gt('People')}
                       </tspan>
                     </text>
                     <circle
