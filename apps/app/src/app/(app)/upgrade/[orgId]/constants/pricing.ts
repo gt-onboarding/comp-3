@@ -1,20 +1,22 @@
+import { msg } from 'gt-next';
+
 export const PRICING_FEATURES = {
   starter: [
-    'Access to all frameworks',
-    'Trust & Security Portal',
-    'AI Vendor Management',
-    'AI Risk Management',
-    'Unlimited team members',
-    'API access',
-    'Community Support',
+    msg('Access to all frameworks'),
+    msg('Trust & Security Portal'),
+    msg('AI Vendor Management'),
+    msg('AI Risk Management'),
+    msg('Unlimited team members'),
+    msg('API access'),
+    msg('Community Support'),
   ],
   managed: [
-    'Any Framework',
-    '3rd Party Audit Included',
-    'Compliant in 14 Days or Less',
-    'Dedicated Success Team',
-    '24x7x365 Support & SLA',
-    'Slack Channel with Comp AI',
+    msg('Any Framework'),
+    msg('3rd Party Audit Included'),
+    msg('Compliant in 14 Days or Less'),
+    msg('Dedicated Success Team'),
+    msg('24x7x365 Support & SLA'),
+    msg('Slack Channel with Comp AI'),
   ],
 } as const;
 

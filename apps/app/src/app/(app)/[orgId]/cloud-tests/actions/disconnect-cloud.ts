@@ -1,6 +1,7 @@
 'use server';
 
 import { db } from '@db';
+import { getGT } from 'gt-next/server';
 import { revalidatePath } from 'next/cache';
 import { headers } from 'next/headers';
 import { z } from 'zod';
@@ -20,11 +21,12 @@ export const disconnectCloudAction = authActionClient
     },
   })
   .action(async ({ parsedInput: { cloudProvider }, ctx: { session } }) => {
+    const gt = await getGT();
     try {
       if (!session.activeOrganizationId) {
         return {
           success: false,
-          error: 'No active organization found',
+          error: gt('No active organization found'),
         };
       }
 
@@ -39,7 +41,7 @@ export const disconnectCloudAction = authActionClient
       if (!integration) {
         return {
           success: false,
-          error: 'Cloud provider not found',
+          error: gt('Cloud provider not found'),
         };
       }
 
@@ -61,7 +63,7 @@ export const disconnectCloudAction = authActionClient
       console.error('Failed to disconnect cloud provider:', error);
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Failed to disconnect cloud provider',
+        error: error instanceof Error ? error.message : gt('Failed to disconnect cloud provider'),
       };
     }
   });

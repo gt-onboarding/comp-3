@@ -3,10 +3,12 @@
 import { runIntegrationTests } from '@/trigger/tasks/integration/run-integration-tests';
 import { auth } from '@/utils/auth';
 import { tasks } from '@trigger.dev/sdk';
+import { getGT } from 'gt-next/server';
 import { revalidatePath } from 'next/cache';
 import { headers } from 'next/headers';
 
 export const runTests = async () => {
+  const gt = await getGT();
   const session = await auth.api.getSession({
     headers: await headers(),
   });
@@ -14,7 +16,7 @@ export const runTests = async () => {
   if (!session) {
     return {
       success: false,
-      errors: ['Unauthorized'],
+      errors: [gt('Unauthorized')],
     };
   }
 
@@ -22,7 +24,7 @@ export const runTests = async () => {
   if (!orgId) {
     return {
       success: false,
-      errors: ['No active organization'],
+      errors: [gt('No active organization')],
     };
   }
 
@@ -48,7 +50,7 @@ export const runTests = async () => {
 
     return {
       success: false,
-      errors: [error instanceof Error ? error.message : 'Failed to trigger integration tests'],
+      errors: [error instanceof Error ? error.message : gt('Failed to trigger integration tests')],
     };
   }
 };

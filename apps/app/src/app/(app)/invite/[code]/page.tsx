@@ -7,6 +7,7 @@ import { AcceptInvite } from '../../setup/components/accept-invite';
 import { InviteNotMatchCard } from './components/InviteNotMatchCard';
 import { InviteStatusCard } from './components/InviteStatusCard';
 import { maskEmail } from './utils';
+import { msg } from 'gt-next';
 
 interface InvitePageProps {
   params: Promise<{ code: string }>;
@@ -40,10 +41,10 @@ export default async function InvitePage({ params }: InvitePageProps) {
       <OnboardingLayout variant="setup" currentOrganization={null}>
         <div className="flex min-h-[calc(100dvh-80px)] w-full items-center justify-center p-4">
           <InviteStatusCard
-            title="Invite not found"
-            description="This invitation code does not exist. Please check the link or ask your admin to resend the invite."
+            title={msg("Invite not found")}
+            description={msg("This invitation code does not exist. Please check the link or ask your admin to resend the invite.")}
             primaryHref="/"
-            primaryLabel="Go home"
+            primaryLabel={msg("Go home")}
           />
         </div>
       </OnboardingLayout>
@@ -55,14 +56,14 @@ export default async function InvitePage({ params }: InvitePageProps) {
       <OnboardingLayout variant="setup" currentOrganization={null}>
         <div className="flex min-h-[calc(100dvh-80px)] w-full items-center justify-center p-4">
           <InviteStatusCard
-            title={invitation.status === 'accepted' ? 'Invite already accepted' : 'Invite expired'}
+            title={invitation.status === 'accepted' ? msg('Invite already accepted') : msg('Invite expired')}
             description={
               invitation.status === 'accepted'
-                ? 'This invitation has already been accepted. If you believe this is a mistake, contact your organization admin.'
-                : 'This invitation has expired. Please ask your organization admin to send a new invite.'
+                ? msg('This invitation has already been accepted. If you believe this is a mistake, contact your organization admin.')
+                : msg('This invitation has expired. Please ask your organization admin to send a new invite.')
             }
             primaryHref="/"
-            primaryLabel="Go home"
+            primaryLabel={msg("Go home")}
           />
         </div>
       </OnboardingLayout>

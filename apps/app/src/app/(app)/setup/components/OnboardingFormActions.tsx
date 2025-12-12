@@ -2,6 +2,7 @@ import { Button } from '@comp/ui/button';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Loader2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { T } from 'gt-next';
 
 interface OnboardingFormActionsProps {
   onBack: () => void;
@@ -46,7 +47,7 @@ export function OnboardingFormActions({
           onClick={onPrefillAll}
           disabled={isSubmitting}
         >
-          Complete
+          <T>Complete</T>
         </Button>
       )}
       <AnimatePresence>
@@ -65,7 +66,7 @@ export function OnboardingFormActions({
               onClick={onBack}
               disabled={isSubmitting || stepIndex === 0} // stepIndex === 0 check is redundant due to conditional rendering but good for safety
             >
-              Previous
+              <T>Previous</T>
             </Button>
           </motion.div>
         )}
@@ -94,7 +95,7 @@ export function OnboardingFormActions({
               className="flex items-center gap-2"
             >
               {isOnboarding && <Loader2 className="h-4 w-4 animate-spin" />}
-              Complete
+              <T>Complete</T>
             </motion.span>
           </Button>
         ) : (
@@ -113,7 +114,7 @@ export function OnboardingFormActions({
               transition={{ duration: 0.2 }}
               className="flex items-center"
             >
-              Continue
+              <T>Continue</T>
             </motion.span>
           </Button>
         )}

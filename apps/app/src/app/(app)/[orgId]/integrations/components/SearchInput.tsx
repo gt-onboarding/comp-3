@@ -2,6 +2,7 @@
 
 import { cn } from '@comp/ui/utils/cn';
 import { Search, X } from 'lucide-react';
+import { useGT } from 'gt-next';
 
 interface SearchInputProps {
   value: string;
@@ -11,6 +12,7 @@ interface SearchInputProps {
 }
 
 export function SearchInput({ value, onChange, placeholder, className }: SearchInputProps) {
+  const gt = useGT();
   return (
     <div className={cn('relative w-full', className)}>
       <div className="relative w-full min-h-[40px] rounded-md border border-input bg-background flex items-center">
@@ -28,7 +30,7 @@ export function SearchInput({ value, onChange, placeholder, className }: SearchI
             onClick={() => onChange('')}
             className="absolute inset-y-0 right-0 flex items-center pr-3 touch-manipulation"
             type="button"
-            aria-label="Clear search"
+            aria-label={gt('Clear search')}
           >
             <X className="w-4 h-4 text-muted-foreground hover:text-foreground transition-colors" />
           </button>

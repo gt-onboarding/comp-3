@@ -2,6 +2,7 @@ import { auth } from '@/utils/auth';
 import { db } from '@db';
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
+import { T } from 'gt-next';
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const session = await auth.api.getSession({
@@ -28,13 +29,15 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         <div className="container mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <h1 className="text-lg font-semibold">Platform Admin</h1>
+              <T>
+                <h1 className="text-lg font-semibold">Platform Admin</h1>
+              </T>
               <nav className="flex items-center gap-4 text-sm">
                 <a
                   href="/admin/integrations"
                   className="text-muted-foreground hover:text-foreground transition-colors"
                 >
-                  Integrations
+                  <T>Integrations</T>
                 </a>
               </nav>
             </div>
@@ -42,7 +45,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
               href="/"
               className="text-sm text-muted-foreground hover:text-foreground transition-colors"
             >
-              ← Back to Dashboard
+              <T>← Back to Dashboard</T>
             </a>
           </div>
         </div>

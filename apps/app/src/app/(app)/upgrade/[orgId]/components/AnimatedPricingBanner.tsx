@@ -1,10 +1,12 @@
 'use client';
 
 import { AnimatedGradientBackground } from '@/app/(app)/setup/components/AnimatedGradientBackground';
+import { useGT } from 'gt-next';
 import { Sparkles } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 export function AnimatedPricingBanner() {
+  const gt = useGT();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -12,10 +14,10 @@ export function AnimatedPricingBanner() {
   }, []);
 
   const messages = [
-    'AI is analyzing your compliance needs',
-    'Customizing your security framework',
-    'Building your compliance roadmap',
-    'Optimizing for your industry requirements',
+    gt('AI is analyzing your compliance needs'),
+    gt('Customizing your security framework'),
+    gt('Building your compliance roadmap'),
+    gt('Optimizing for your industry requirements'),
   ];
 
   const [currentMessageIndex, setCurrentMessageIndex] = useState(0);

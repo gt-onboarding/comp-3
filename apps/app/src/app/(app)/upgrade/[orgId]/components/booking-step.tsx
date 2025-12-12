@@ -3,6 +3,7 @@
 import { Button } from '@comp/ui/button';
 import { Card } from '@comp/ui/card';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@comp/ui/tooltip';
+import { T, Var, Branch, useGT } from 'gt-next';
 import { Check, Copy } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
@@ -17,12 +18,13 @@ export function BookingStep({
   hasAccess: boolean;
 }) {
   const [isCopied, setIsCopied] = useState(false);
+  const gt = useGT();
 
-  const title = !hasAccess ? `Let's get ${company} approved` : 'Talk to us to upgrade';
+  const title = !hasAccess ? gt("Let's get {company} approved", { company }) : gt('Talk to us to upgrade');
 
   const description = !hasAccess
-    ? `Please copy and share the Org ID below in your with your Customer Success Rep in Slack`
-    : `A quick 20-minute call with our team to understand your compliance needs and upgrade your plan.`;
+    ? gt('Please copy and share the Org ID below in your with your Customer Success Rep in Slack')
+    : gt('A quick 20-minute call with our team to understand your compliance needs and upgrade your plan.');
 
   const handleCopyOrgId = async () => {
     if (isCopied) return;
@@ -30,14 +32,14 @@ export function BookingStep({
     try {
       await navigator.clipboard.writeText(orgId);
       setIsCopied(true);
-      toast.success('Org ID copied to clipboard');
+      toast.success(gt('Org ID copied to clipboard'));
 
       // Reset after 3 seconds
       setTimeout(() => {
         setIsCopied(false);
       }, 3000);
     } catch (error) {
-      toast.error('Failed to copy Org ID');
+      toast.error(gt('Failed to copy Org ID'));
     }
   };
 
@@ -53,9 +55,11 @@ export function BookingStep({
 
           {/* Org ID Display with Copy Button */}
           <div className="flex items-center justify-center mb-4">
-            <span className="text-xs font-mono px-3 rounded-sm border bg-background border-input text-foreground select-all flex items-center h-9 border-r-0 rounded-tr-none rounded-br-none">
-              Org ID: {orgId}
-            </span>
+            <T>
+              <span className="text-xs font-mono px-3 rounded-sm border bg-background border-input text-foreground select-all flex items-center h-9 border-r-0 rounded-tr-none rounded-br-none">
+                Org ID: <Var>{orgId}</Var>
+              </span>
+            </T>
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -65,7 +69,7 @@ export function BookingStep({
                     variant="outline"
                     className="text-xs rounded-tl-none rounded-bl-none"
                     onClick={handleCopyOrgId}
-                    aria-label={isCopied ? 'Copied!' : 'Copy Org ID'}
+                    aria-label={isCopied ? gt('Copied!') : gt('Copy Org ID')}
                   >
                     {isCopied ? (
                       <Check className="w-4 h-4 text-green-600 dark:text-green-400" />
@@ -75,7 +79,15 @@ export function BookingStep({
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p className="text-xs">{isCopied ? 'Copied!' : 'Copy Org ID'}</p>
+                  <T>
+                    <p className="text-xs">
+                      <Branch
+                        branch={isCopied.toString()}
+                        true={<>Copied!</>}
+                        false={<>Copy Org ID</>}
+                      />
+                    </p>
+                  </T>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>

@@ -5,6 +5,7 @@ import { FormLabel } from '@comp/ui/form';
 import { Input } from '@comp/ui/input';
 import { Label } from '@comp/ui/label';
 import { Textarea } from '@comp/ui/textarea';
+import { T, useGT, useMessages } from 'gt-next';
 import { ChevronDown, ChevronUp, Plus, Trash2, X } from 'lucide-react';
 import { useRef, useState } from 'react';
 import type { UseFormReturn } from 'react-hook-form';
@@ -31,6 +32,8 @@ export function OnboardingStepInput({
   onLoadingChange,
 }: OnboardingStepInputProps) {
   // Hooks must be called at the top level
+  const gt = useGT();
+  const m = useMessages();
   const [customValue, setCustomValue] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -57,10 +60,10 @@ export function OnboardingStepInput({
         <AnimatedWrapper delay={100}>
           <div className="flex flex-col gap-4 sm:flex-row">
             <div className="flex-1 space-y-1.5">
-              <Label>Full Name</Label>
+              <Label>{gt('Full Name')}</Label>
               <Input
                 {...form.register('shipping.fullName')}
-                placeholder="John Doe"
+                placeholder={gt('John Doe')}
                 autoFocus
                 data-testid={`onboarding-input-${currentStep.key}-fullName`}
               />
@@ -71,10 +74,10 @@ export function OnboardingStepInput({
               )}
             </div>
             <div className="flex-1 space-y-1.5">
-              <Label>Phone</Label>
+              <Label>{gt('Phone')}</Label>
               <Input
                 {...form.register('shipping.phone')}
-                placeholder="+1 (555) 123-4567"
+                placeholder={gt('+1 (555) 123-4567')}
                 data-testid={`onboarding-input-${currentStep.key}-phone`}
               />
               {isSubmitted && errors.shipping?.phone?.message && (
@@ -87,10 +90,10 @@ export function OnboardingStepInput({
         </AnimatedWrapper>
         <AnimatedWrapper delay={200}>
           <div className="space-y-1.5">
-            <Label>Address</Label>
+            <Label>{gt('Address')}</Label>
             <Textarea
               {...form.register('shipping.address')}
-              placeholder="123 Main St, Apt 4B, Springfield, IL, USA"
+              placeholder={gt('123 Main St, Apt 4B, Springfield, IL, USA')}
               rows={2}
               maxLength={300}
               data-testid={`onboarding-input-${currentStep.key}-address`}
@@ -103,9 +106,11 @@ export function OnboardingStepInput({
           </div>
         </AnimatedWrapper>
         <AnimatedWrapper delay={300}>
-          <p className="text-xs text-center sm:text-left text-muted-foreground">
-            * We won't use your shipping details for any marketing.
-          </p>
+          <T>
+            <p className="text-xs text-center sm:text-left text-muted-foreground">
+              * We won't use your shipping details for any marketing.
+            </p>
+          </T>
         </AnimatedWrapper>
       </div>
     );
@@ -120,7 +125,7 @@ export function OnboardingStepInput({
           render={({ field }) => (
             <WebsiteInput
               {...field}
-              placeholder="example.com"
+              placeholder={gt('example.com')}
               autoFocus
               data-testid={`onboarding-input-${currentStep.key}`}
             />
@@ -135,7 +140,9 @@ export function OnboardingStepInput({
       <AnimatedWrapper delay={100} animationKey={`describe-${currentStep.key}`}>
         <Textarea
           {...form.register(currentStep.key)}
-          placeholder={`${savedAnswers.organizationName || ''} is a company that...`}
+          placeholder={gt('{organizationName} is a company that...', {
+            organizationName: savedAnswers.organizationName || '',
+          })}
           rows={2}
           maxLength={300}
           className="h-24 resize-none"
@@ -152,10 +159,10 @@ export function OnboardingStepInput({
           <NumberInput
             value={form.watch(currentStep.key) || ''}
             onChange={(val) => form.setValue(currentStep.key, val)}
-            placeholder={currentStep.placeholder}
+            placeholder={currentStep.placeholder ? m(currentStep.placeholder) : undefined}
           />
           {currentStep.description && (
-            <p className="text-xs text-muted-foreground">{currentStep.description}</p>
+            <p className="text-xs text-muted-foreground">{m(currentStep.description)}</p>
           )}
         </div>
       </AnimatedWrapper>
@@ -174,10 +181,10 @@ export function OnboardingStepInput({
         <AnimatedWrapper delay={100}>
           <div className="flex flex-col gap-4">
             <div className="space-y-1.5">
-              <Label>Full Name</Label>
+              <Label>{gt('Full Name')}</Label>
               <Input
                 {...form.register('reportSignatory.fullName')}
-                placeholder="John Doe"
+                placeholder={gt('John Doe')}
                 autoFocus
               />
               {isSubmitted && errors.reportSignatory?.fullName?.message && (
@@ -187,8 +194,11 @@ export function OnboardingStepInput({
               )}
             </div>
             <div className="space-y-1.5">
-              <Label>Job Title</Label>
-              <Input {...form.register('reportSignatory.jobTitle')} placeholder="CEO" />
+              <Label>{gt('Job Title')}</Label>
+              <Input
+                {...form.register('reportSignatory.jobTitle')}
+                placeholder={gt('CEO')}
+              />
               {isSubmitted && errors.reportSignatory?.jobTitle?.message && (
                 <p className="text-destructive text-[0.8rem] font-medium">
                   {errors.reportSignatory.jobTitle.message}
@@ -196,11 +206,11 @@ export function OnboardingStepInput({
               )}
             </div>
             <div className="space-y-1.5">
-              <Label>Email</Label>
+              <Label>{gt('Email')}</Label>
               <Input
                 {...form.register('reportSignatory.email')}
                 type="email"
-                placeholder="john@company.com"
+                placeholder={gt('john@company.com')}
               />
               {isSubmitted && errors.reportSignatory?.email?.message && (
                 <p className="text-destructive text-[0.8rem] font-medium">
@@ -212,7 +222,7 @@ export function OnboardingStepInput({
         </AnimatedWrapper>
         {currentStep.description && (
           <AnimatedWrapper delay={200}>
-            <p className="text-xs text-muted-foreground">{currentStep.description}</p>
+            <p className="text-xs text-muted-foreground">{m(currentStep.description)}</p>
           </AnimatedWrapper>
         )}
       </div>
@@ -317,7 +327,9 @@ export function OnboardingStepInput({
               value={customValue}
               onChange={(e) => setCustomValue(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder={selectedValues.length === 0 ? 'Search or add custom (press Enter)' : ''}
+              placeholder={
+                selectedValues.length === 0 ? gt('Search or add custom (press Enter)') : ''
+              }
               className="flex-1 min-w-[120px] outline-none bg-transparent text-sm placeholder:text-muted-foreground"
               autoFocus
             />
@@ -350,7 +362,7 @@ export function OnboardingStepInput({
     <AnimatedWrapper delay={100} animationKey={`input-${currentStep.key}`}>
       <Input
         {...form.register(currentStep.key)}
-        placeholder={currentStep.placeholder}
+        placeholder={currentStep.placeholder ? m(currentStep.placeholder) : undefined}
         autoFocus
         data-testid={`onboarding-input-${currentStep.key}`}
       />
@@ -366,6 +378,8 @@ function CSuiteInput({
   form: UseFormReturn<OnboardingFormFields>;
   description?: string;
 }) {
+  const gt = useGT();
+  const m = useMessages();
   const { fields, append, remove } = useFieldArray({
     control: form.control,
     name: 'cSuite',
@@ -388,12 +402,12 @@ function CSuiteInput({
                 <div className="flex gap-2">
                   <Input
                     {...form.register(`cSuite.${index}.name`)}
-                    placeholder="Full name"
+                    placeholder={gt('Full name')}
                     autoFocus={index === 0}
                   />
                   <Input
                     {...form.register(`cSuite.${index}.title`)}
-                    placeholder="Title (e.g., CEO)"
+                    placeholder={gt('Title (e.g., CEO)')}
                     list={`titles-${index}`}
                   />
                   <datalist id={`titles-${index}`}>
@@ -428,13 +442,13 @@ function CSuiteInput({
           className="gap-1"
         >
           <Plus className="h-4 w-4" />
-          Add Executive
+          {gt('Add Executive')}
         </Button>
       </AnimatedWrapper>
 
       {description && (
         <AnimatedWrapper delay={300}>
-          <p className="text-xs text-muted-foreground">{description}</p>
+          <p className="text-xs text-muted-foreground">{m(description)}</p>
         </AnimatedWrapper>
       )}
     </div>

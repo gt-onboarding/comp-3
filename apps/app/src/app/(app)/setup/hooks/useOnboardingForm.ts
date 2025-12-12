@@ -2,6 +2,7 @@
 
 import { trackEvent, trackOnboardingEvent } from '@/utils/tracking';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useGT } from 'gt-next';
 import { sendGTMEvent } from '@next/third-parties/google';
 import { useAction } from 'next-safe-action/hooks';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -31,6 +32,7 @@ export function useOnboardingForm({
 }: UseOnboardingFormProps = {}) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const gt = useGT();
 
   // Helper to build URL with search params
   const buildUrlWithParams = (path: string, params?: Record<string, string>) => {
@@ -127,13 +129,13 @@ export function useOnboardingForm({
         // Clear answers after successful creation
         setSavedAnswers({});
       } else {
-        toast.error('Failed to create organization');
+        toast.error(gt('Failed to create organization'));
         setIsFinalizing(false);
         setIsOnboarding(false);
       }
     },
     onError: () => {
-      toast.error('Failed to create organization');
+      toast.error(gt('Failed to create organization'));
       setIsFinalizing(false);
       setIsOnboarding(false);
     },
@@ -248,7 +250,7 @@ export function useOnboardingForm({
       handleCreateOrganizationAction(prefilledAnswers);
     } catch (error) {
       console.error('Error pre-filling answers:', error);
-      toast.error('Failed to pre-fill answers');
+      toast.error(gt('Failed to pre-fill answers'));
     }
   };
 

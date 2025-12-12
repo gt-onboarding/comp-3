@@ -30,7 +30,7 @@ export const createOrganization = authActionClientWithoutOrg
       if (!session) {
         return {
           success: false,
-          error: 'Not authorized.',
+          error: 'not_authorized',
         };
       }
 
@@ -164,7 +164,7 @@ export const createOrganization = authActionClientWithoutOrg
 
       return {
         success: false,
-        error: 'Failed to create or update organization structure',
+        error: 'failed_to_create_organization',
       };
     }
   });

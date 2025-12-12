@@ -3,6 +3,7 @@
 import { AnimatedWrapper } from '@/components/animated-wrapper';
 import { LogoSpinner } from '@/components/logo-spinner';
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@comp/ui/form';
+import { T, useMessages } from 'gt-next';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Balancer from 'react-wrap-balancer';
@@ -22,6 +23,7 @@ export function OrganizationSetupForm({
 }: OrganizationSetupFormProps) {
   const [isLoadingFrameworks, setIsLoadingFrameworks] = useState(false);
   const router = useRouter();
+  const m = useMessages();
 
   const {
     stepIndex,
@@ -100,13 +102,15 @@ export function OrganizationSetupForm({
         <div className="mb-8">
           <AnimatedWrapper delay={800} animationKey={`title-${step.key}`}>
             <h1 className="text-2xl md:text-4xl font-bold text-foreground mb-2">
-              <Balancer>{step.question}</Balancer>
+              <Balancer>{m(step.question)}</Balancer>
             </h1>
           </AnimatedWrapper>
           <AnimatedWrapper delay={1000} animationKey={`subtitle-${step.key}`}>
-            <p className="text-md md:text-lg text-muted-foreground flex items-center flex-wrap">
-              <Balancer>Our AI will personalize the platform based on your answers.</Balancer>
-            </p>
+            <T>
+              <p className="text-md md:text-lg text-muted-foreground flex items-center flex-wrap">
+                <Balancer>Our AI will personalize the platform based on your answers.</Balancer>
+              </p>
+            </T>
           </AnimatedWrapper>
         </div>
 
