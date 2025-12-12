@@ -6,6 +6,7 @@ import { createFleetLabelForOrg } from '@/trigger/tasks/device/create-fleet-labe
 import { onboardOrganization as onboardOrganizationTask } from '@/trigger/tasks/onboarding/onboard-organization';
 import { db } from '@db';
 import { tasks } from '@trigger.dev/sdk';
+import { getGT } from 'gt-next/server';
 import { revalidatePath } from 'next/cache';
 import { cookies, headers } from 'next/headers';
 import { z } from 'zod';
@@ -51,6 +52,7 @@ export const completeOnboarding = authActionClient
     },
   })
   .action(async ({ parsedInput, ctx }) => {
+    const gt = await getGT();
     try {
       const { activeOrganizationId } = ctx.session;
 
@@ -58,7 +60,7 @@ export const completeOnboarding = authActionClient
       if (parsedInput.organizationId !== activeOrganizationId) {
         return {
           success: false,
-          error: 'Organization mismatch',
+          error: gt('Organization mismatch'),
         };
       }
 
@@ -74,7 +76,7 @@ export const completeOnboarding = authActionClient
       if (!member) {
         return {
           success: false,
-          error: 'Access denied',
+          error: gt('Access denied'),
         };
       }
 
@@ -148,7 +150,7 @@ export const completeOnboarding = authActionClient
 
       return {
         success: false,
-        error: 'Failed to complete onboarding',
+        error: gt('Failed to complete onboarding'),
       };
     }
   });

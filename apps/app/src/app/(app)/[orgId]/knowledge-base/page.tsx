@@ -13,6 +13,7 @@ import {
   getManualAnswers,
   getPublishedPolicies,
 } from '../questionnaire/knowledge-base/data/queries';
+import { getGT } from 'gt-next/server';
 
 export default async function KnowledgeBasePage() {
   const session = await auth.api.getSession({
@@ -24,6 +25,7 @@ export default async function KnowledgeBasePage() {
   }
 
   const organizationId = session.session.activeOrganizationId;
+  const gt = await getGT();
 
   // Fetch all data in parallel
   const [policies, contextEntries, manualAnswers, documents] = await Promise.all([
@@ -36,7 +38,7 @@ export default async function KnowledgeBasePage() {
   return (
     <PageWithBreadcrumb
       breadcrumbs={[
-        { label: 'Overview', current: true },
+        { label: gt('Overview'), current: true },
       ]}
       className="px-6"
     >

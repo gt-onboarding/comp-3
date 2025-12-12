@@ -2,6 +2,7 @@
 
 import { Download } from 'lucide-react';
 import Image from 'next/image';
+import { T, useGT, Var } from 'gt-next';
 
 interface AuditorViewProps {
   initialContent: Record<string, string>;
@@ -20,6 +21,8 @@ export function AuditorView({
   cSuite,
   reportSignatory,
 }: AuditorViewProps) {
+  const gt = useGT();
+
   return (
     <div className="flex flex-col gap-10">
       {/* Header */}
@@ -29,9 +32,14 @@ export function AuditorView({
             href={logoUrl}
             download={`${organizationName.replace(/[^a-zA-Z0-9]/g, '_')}_logo`}
             className="group relative h-14 w-14 shrink-0 overflow-hidden rounded-lg border bg-background transition-all hover:shadow-md"
-            title="Download logo"
+            title={gt('Download logo')}
           >
-            <Image src={logoUrl} alt={`${organizationName} logo`} fill className="object-contain" />
+            <Image
+              src={logoUrl}
+              alt={gt('{organizationName} logo', { organizationName })}
+              fill
+              className="object-contain"
+            />
             <div className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 transition-opacity group-hover:opacity-100">
               <Download className="h-4 w-4 text-white" />
             </div>
@@ -41,20 +49,22 @@ export function AuditorView({
           <h1 className="text-foreground text-xl font-semibold tracking-tight">
             {organizationName}
           </h1>
-          <p className="text-muted-foreground text-sm">Company Overview</p>
+          <T>
+            <p className="text-muted-foreground text-sm">Company Overview</p>
+          </T>
         </div>
       </div>
 
       {/* Company Information */}
-      <Section title="Company Information">
+      <Section title={gt('Company Information')}>
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           <InfoCell
-            label="Employees"
+            label={gt('Employees')}
             value={employeeCount || '—'}
             className="lg:border-r lg:border-border lg:pr-6"
           />
           <InfoCell
-            label="Report Signatory"
+            label={gt('Report Signatory')}
             className="lg:border-r lg:border-border lg:pr-6"
             value={
               reportSignatory ? (
@@ -75,7 +85,7 @@ export function AuditorView({
             }
           />
           <InfoCell
-            label="Executive Team"
+            label={gt('Executive Team')}
             className="sm:col-span-2 lg:col-span-1"
             value={
               cSuite.length > 0 ? (
@@ -96,31 +106,40 @@ export function AuditorView({
       </Section>
 
       {/* Business Overview */}
-      <Section title="Business Overview">
+      <Section title={gt('Business Overview')}>
         <div className="space-y-6">
           <ContentRow
-            title="Company Background & Overview of Operations"
+            title={gt('Company Background & Overview of Operations')}
             content={initialContent['Company Background & Overview of Operations']}
           />
           <ContentRow
-            title="Types of Services Provided"
+            title={gt('Types of Services Provided')}
             content={initialContent['Types of Services Provided']}
           />
-          <ContentRow title="Mission & Vision" content={initialContent['Mission & Vision']} />
+          <ContentRow
+            title={gt('Mission & Vision')}
+            content={initialContent['Mission & Vision']}
+          />
         </div>
       </Section>
 
       {/* System Architecture */}
-      <Section title="System Architecture">
-        <ContentRow title="System Description" content={initialContent['System Description']} />
+      <Section title={gt('System Architecture')}>
+        <ContentRow
+          title={gt('System Description')}
+          content={initialContent['System Description']}
+        />
       </Section>
 
       {/* Third Party Dependencies */}
-      <Section title="Third Party Dependencies">
+      <Section title={gt('Third Party Dependencies')}>
         <div className="grid gap-6 lg:grid-cols-2">
-          <ContentRow title="Critical Vendors" content={initialContent['Critical Vendors']} />
           <ContentRow
-            title="Subservice Organizations"
+            title={gt('Critical Vendors')}
+            content={initialContent['Critical Vendors']}
+          />
+          <ContentRow
+            title={gt('Subservice Organizations')}
             content={initialContent['Subservice Organizations']}
           />
         </div>
@@ -133,9 +152,11 @@ function Section({ title, children }: { title: string; children: React.ReactNode
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-3 border-b border-border pb-2">
-        <h2 className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-          {title}
-        </h2>
+        <T>
+          <h2 className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+            <Var>{title}</Var>
+          </h2>
+        </T>
       </div>
       {children}
     </div>
@@ -153,9 +174,11 @@ function InfoCell({
 }) {
   return (
     <div className={className || ''}>
-      <div className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground mb-1.5">
-        {label}
-      </div>
+      <T>
+        <div className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground mb-1.5">
+          <Var>{label}</Var>
+        </div>
+      </T>
       <div className="text-sm text-foreground">{value}</div>
     </div>
   );
@@ -163,16 +186,23 @@ function InfoCell({
 
 function ContentRow({ title, content }: { title: string; content?: string }) {
   const hasContent = content?.trim().length;
+  const gt = useGT();
 
   return (
     <div className="space-y-1.5">
-      <h3 className="text-sm font-medium text-foreground">{title}</h3>
+      <T>
+        <h3 className="text-sm font-medium text-foreground">
+          <Var>{title}</Var>
+        </h3>
+      </T>
       {hasContent ? (
         <p className="text-sm leading-relaxed text-muted-foreground whitespace-pre-wrap">
           {content}
         </p>
       ) : (
-        <p className="text-xs text-muted-foreground/50">Not yet available</p>
+        <T>
+          <p className="text-xs text-muted-foreground/50">Not yet available</p>
+        </T>
       )}
     </div>
   );

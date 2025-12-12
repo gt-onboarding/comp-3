@@ -12,6 +12,7 @@ import { Button } from '@comp/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@comp/ui/card';
 import { Input } from '@comp/ui/input';
 import { Label } from '@comp/ui/label';
+import { T, useGT } from 'gt-next';
 import {
   AlertCircle,
   CheckCircle2,
@@ -179,6 +180,7 @@ function OAuthAvailabilityCard({
 }) {
   const params = useParams<{ orgId: string }>();
   const orgId = params?.orgId;
+  const gt = useGT();
 
   const [availability, setAvailability] = useState<OAuthAvailability | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -249,7 +251,7 @@ function OAuthAvailabilityCard({
 
   const handleDeleteCredentials = async () => {
     if (!orgId) return;
-    if (!confirm('Delete custom OAuth credentials?')) return;
+    if (!confirm(gt('Delete custom OAuth credentials?'))) return;
 
     onLog(`Deleting OAuth credentials for ${providerSlug}...`);
 
@@ -291,7 +293,7 @@ function OAuthAvailabilityCard({
               ) : (
                 <XCircle className="h-3 w-3 text-red-500" />
               )}
-              <span>Available</span>
+              <span>{gt('Available')}</span>
             </div>
             <div className="flex items-center gap-1">
               {availability.hasOrgCredentials ? (
@@ -299,7 +301,7 @@ function OAuthAvailabilityCard({
               ) : (
                 <XCircle className="h-3 w-3 text-gray-400" />
               )}
-              <span>Org Creds</span>
+              <span>{gt('Org Creds')}</span>
             </div>
             <div className="flex items-center gap-1">
               {availability.hasPlatformCredentials ? (
@@ -307,13 +309,13 @@ function OAuthAvailabilityCard({
               ) : (
                 <XCircle className="h-3 w-3 text-gray-400" />
               )}
-              <span>Platform Creds</span>
+              <span>{gt('Platform Creds')}</span>
             </div>
           </div>
 
           {!availability.available && availability.setupInstructions && (
             <details className="text-xs">
-              <summary className="cursor-pointer text-muted-foreground">Setup Instructions</summary>
+              <summary className="cursor-pointer text-muted-foreground">{gt('Setup Instructions')}</summary>
               <pre className="mt-2 p-2 bg-muted rounded text-xs whitespace-pre-wrap">
                 {availability.setupInstructions}
               </pre>
@@ -328,7 +330,7 @@ function OAuthAvailabilityCard({
               className="text-xs text-blue-500 hover:underline flex items-center gap-1"
             >
               <ExternalLink className="h-3 w-3" />
-              Create OAuth App
+              {gt('Create OAuth App')}
             </a>
           )}
         </div>
@@ -338,27 +340,27 @@ function OAuthAvailabilityCard({
         <div className="mt-3 pt-3 border-t space-y-3">
           <div className="text-xs font-medium flex items-center gap-1">
             <Key className="h-3 w-3" />
-            Configure Custom OAuth App
+            {gt('Configure Custom OAuth App')}
           </div>
 
           <div className="space-y-2">
             <div>
-              <Label className="text-xs">Client ID</Label>
+              <Label className="text-xs">{gt('Client ID')}</Label>
               <Input
                 size={1}
                 className="h-8 text-xs font-mono"
-                placeholder="Your OAuth App Client ID"
+                placeholder={gt('Your OAuth App Client ID')}
                 value={clientId}
                 onChange={(e) => setClientId(e.target.value)}
               />
             </div>
             <div>
-              <Label className="text-xs">Client Secret</Label>
+              <Label className="text-xs">{gt('Client Secret')}</Label>
               <Input
                 size={1}
                 type="password"
                 className="h-8 text-xs font-mono"
-                placeholder="Your OAuth App Client Secret"
+                placeholder={gt('Your OAuth App Client Secret')}
                 value={clientSecret}
                 onChange={(e) => setClientSecret(e.target.value)}
               />
@@ -372,13 +374,13 @@ function OAuthAvailabilityCard({
               disabled={!clientId || !clientSecret || isSaving}
             >
               {isSaving ? <Loader2 className="h-3 w-3 animate-spin mr-1" /> : null}
-              Save Credentials
+              {gt('Save Credentials')}
             </Button>
 
             {availability?.hasOrgCredentials && (
               <Button size="sm" variant="destructive" onClick={handleDeleteCredentials}>
                 <Trash2 className="h-3 w-3 mr-1" />
-                Delete
+                {gt('Delete')}
               </Button>
             )}
           </div>
@@ -403,6 +405,7 @@ function ConnectionVariablesConfig({
   onLog: (message: string) => void;
   onSaved: () => void;
 }) {
+  const gt = useGT();
   const [variables, setVariables] = useState<VariableDefinition[]>([]);
   const [values, setValues] = useState<Record<string, string | number | boolean | string[]>>({});
   const [loading, setLoading] = useState(true);
@@ -489,7 +492,7 @@ function ConnectionVariablesConfig({
       <div className="p-3 bg-blue-500/10 border border-blue-500/20 rounded-md">
         <div className="flex items-center gap-2 text-sm text-blue-500">
           <Loader2 className="h-4 w-4 animate-spin" />
-          Loading variables...
+          {gt('Loading variables...')}
         </div>
       </div>
     );
@@ -503,7 +506,7 @@ function ConnectionVariablesConfig({
     <div className="p-3 bg-amber-500/10 border border-amber-500/30 rounded-md space-y-3">
       <div className="flex items-center gap-2 text-sm font-medium text-amber-600">
         <Settings className="h-4 w-4" />
-        Configure Check Variables
+        {gt('Configure Check Variables')}
       </div>
 
       <div className="space-y-3">
@@ -527,7 +530,7 @@ function ConnectionVariablesConfig({
                   ) : (
                     <>
                       <RefreshCw className="h-3 w-3 mr-1" />
-                      Load Options
+                      {gt('Load Options')}
                     </>
                   )}
                 </Button>
@@ -572,7 +575,7 @@ function ConnectionVariablesConfig({
                 value={(values[variable.id] as string) || ''}
                 onChange={(e) => updateValue(variable.id, e.target.value)}
               >
-                <option value="">Select...</option>
+                <option value="">{gt('Select...')}</option>
                 {variable.options?.map((opt) => (
                   <option key={opt.value} value={opt.value}>
                     {opt.label}
@@ -608,7 +611,7 @@ function ConnectionVariablesConfig({
                   </div>
                 ) : (
                   <div className="text-xs text-muted-foreground p-2 border rounded-md">
-                    Click "Load Options" to fetch available choices
+                    {gt('Click "Load Options" to fetch available choices')}
                   </div>
                 )}
               </div>
@@ -623,7 +626,7 @@ function ConnectionVariablesConfig({
 
       <Button size="sm" onClick={handleSave} disabled={saving}>
         {saving ? <Loader2 className="h-3 w-3 animate-spin mr-1" /> : null}
-        Save Variables
+        {gt('Save Variables')}
       </Button>
     </div>
   );
@@ -642,6 +645,7 @@ function ConnectionChecksTester({
   providerSlug: string;
   onLog: (message: string) => void;
 }) {
+  const gt = useGT();
   const [checks, setChecks] = useState<CheckDefinition[]>([]);
   const [loading, setLoading] = useState(true);
   const [runningCheck, setRunningCheck] = useState<string | null>(null);
@@ -729,7 +733,7 @@ function ConnectionChecksTester({
       <div className="p-3 bg-muted/50 rounded-md">
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <Loader2 className="h-4 w-4 animate-spin" />
-          Loading checks...
+          {gt('Loading checks...')}
         </div>
       </div>
     );
@@ -738,7 +742,7 @@ function ConnectionChecksTester({
   if (checks.length === 0) {
     return (
       <div className="p-3 bg-muted/50 rounded-md text-sm text-muted-foreground">
-        No checks defined for this integration
+        {gt('No checks defined for this integration')}
       </div>
     );
   }
@@ -748,7 +752,7 @@ function ConnectionChecksTester({
       <div className="flex items-center justify-between">
         <div className="text-sm font-medium flex items-center gap-2">
           <Zap className="h-4 w-4" />
-          Available Checks ({checks.length})
+          {gt('Available Checks ({count})', { count: checks.length })}
         </div>
         <Button size="sm" variant="default" onClick={handleRunAll} disabled={runningCheck !== null}>
           {runningCheck === 'all' ? (
@@ -756,7 +760,7 @@ function ConnectionChecksTester({
           ) : (
             <Play className="h-3 w-3 mr-1" />
           )}
-          Run All
+          {gt('Run All')}
         </Button>
       </div>
 
@@ -771,8 +775,8 @@ function ConnectionChecksTester({
                   <div className="font-medium text-sm">{check.name}</div>
                   <div className="text-xs text-muted-foreground">{check.description}</div>
                   <div className="text-xs text-muted-foreground mt-1 font-mono">
-                    ID: {check.id} • Severity: {check.defaultSeverity}
-                    {check.taskMapping && ` • Task: ${check.taskMapping}`}
+                    {gt('ID: {id} • Severity: {severity}', { id: check.id, severity: check.defaultSeverity })}
+                    {check.taskMapping && gt(' • Task: {task}', { task: check.taskMapping })}
                   </div>
                 </div>
                 <Button
@@ -803,16 +807,16 @@ function ConnectionChecksTester({
                     >
                       {result.status}
                     </span>
-                    <span className="text-muted-foreground">{result.durationMs}ms</span>
+                    <span className="text-muted-foreground">{gt('{duration}ms', { duration: result.durationMs })}</span>
                     {result.result.summary && (
                       <span className="text-muted-foreground">
-                        {result.result.summary.totalChecked} checked
+                        {gt('{count} checked', { count: result.result.summary.totalChecked })}
                       </span>
                     )}
                     <span className="text-green-600">
-                      ✓ {result.result.passingResults.length} passing
+                      {gt('✓ {count} passing', { count: result.result.passingResults.length })}
                     </span>
-                    <span className="text-red-600">✗ {result.result.findings.length} findings</span>
+                    <span className="text-red-600">{gt('✗ {count} findings', { count: result.result.findings.length })}</span>
                   </div>
 
                   {result.error && (
@@ -824,7 +828,7 @@ function ConnectionChecksTester({
                   {result.result.findings.length > 0 && (
                     <details className="text-xs">
                       <summary className="cursor-pointer text-red-600 font-medium">
-                        ✗ Findings ({result.result.findings.length})
+                        {gt('✗ Findings ({count})', { count: result.result.findings.length })}
                       </summary>
                       <div className="mt-1 space-y-1 max-h-60 overflow-y-auto">
                         {result.result.findings.map((finding, i) => (
@@ -857,7 +861,7 @@ function ConnectionChecksTester({
                             </div>
                             {finding.remediation && (
                               <div className="mt-2 p-2 bg-blue-500/10 rounded text-blue-600">
-                                <span className="font-medium">Remediation:</span>{' '}
+                                <span className="font-medium">{gt('Remediation:')}</span>{' '}
                                 {finding.remediation}
                               </div>
                             )}
@@ -870,7 +874,7 @@ function ConnectionChecksTester({
                   {result.result.passingResults.length > 0 && (
                     <details className="text-xs">
                       <summary className="cursor-pointer text-green-600 font-medium">
-                        ✓ Passing ({result.result.passingResults.length})
+                        {gt('✓ Passing ({count})', { count: result.result.passingResults.length })}
                       </summary>
                       <div className="mt-1 space-y-1 max-h-60 overflow-y-auto">
                         {result.result.passingResults.map((pass, i) => (
@@ -888,7 +892,7 @@ function ConnectionChecksTester({
                             {pass.evidence && Object.keys(pass.evidence).length > 0 && (
                               <details className="mt-2">
                                 <summary className="cursor-pointer text-blue-600 font-medium">
-                                  Evidence (click to expand)
+                                  {gt('Evidence (click to expand)')}
                                 </summary>
                                 <pre className="mt-1 p-2 bg-black/50 text-green-400 rounded overflow-x-auto text-[10px]">
                                   {JSON.stringify(pass.evidence, null, 2)}
@@ -905,7 +909,7 @@ function ConnectionChecksTester({
                   {result.result.logs && result.result.logs.length > 0 && (
                     <details className="text-xs">
                       <summary className="cursor-pointer text-muted-foreground font-medium">
-                        📋 Execution Log ({result.result.logs.length} entries)
+                        {gt('📋 Execution Log ({count} entries)', { count: result.result.logs.length })}
                       </summary>
                       <div className="mt-1 p-2 bg-black rounded max-h-60 overflow-y-auto font-mono text-[10px]">
                         {result.result.logs.map((log, i) => (
@@ -953,6 +957,7 @@ function ConnectionChecksTester({
 }
 
 export default function IntegrationPlatformTestPage() {
+  const gt = useGT();
   const [actionLog, setActionLog] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState<string | null>(null);
 
@@ -1045,7 +1050,7 @@ export default function IntegrationPlatformTestPage() {
   };
 
   const handleDelete = async (connectionId: string) => {
-    if (!confirm('Are you sure you want to delete this connection?')) return;
+    if (!confirm(gt('Are you sure you want to delete this connection?'))) return;
 
     setIsLoading(`delete-${connectionId}`);
     log(`Deleting connection ${connectionId}...`);
@@ -1092,16 +1097,20 @@ export default function IntegrationPlatformTestPage() {
   return (
     <div className="container mx-auto p-6 max-w-7xl">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold mb-2">Integration Platform Test Page</h1>
-        <p className="text-muted-foreground text-sm">
-          Debug page for testing the integration platform API and OAuth flows.
-        </p>
+        <T>
+          <h1 className="text-2xl font-bold mb-2">Integration Platform Test Page</h1>
+        </T>
+        <T>
+          <p className="text-muted-foreground text-sm">
+            Debug page for testing the integration platform API and OAuth flows.
+          </p>
+        </T>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left Column - Providers */}
         <div>
-          <DebugSection title="Available Providers">
+          <DebugSection title={gt('Available Providers')}>
             <div className="flex items-center gap-2 mb-3">
               <Button
                 size="sm"
@@ -1110,16 +1119,16 @@ export default function IntegrationPlatformTestPage() {
                 disabled={providersLoading}
               >
                 <RefreshCw className={`h-3 w-3 mr-1 ${providersLoading ? 'animate-spin' : ''}`} />
-                Refresh
+                {gt('Refresh')}
               </Button>
               {providersLoading && (
-                <span className="text-xs text-muted-foreground">Loading...</span>
+                <span className="text-xs text-muted-foreground">{gt('Loading...')}</span>
               )}
               {providersError && <span className="text-xs text-red-500">{providersError}</span>}
             </div>
 
             {providers.length === 0 && !providersLoading ? (
-              <p className="text-sm text-muted-foreground">No providers found</p>
+              <p className="text-sm text-muted-foreground">{gt('No providers found')}</p>
             ) : (
               <div className="space-y-2">
                 {providers.map((provider) => (
@@ -1135,7 +1144,7 @@ export default function IntegrationPlatformTestPage() {
                     </div>
                     <div className="flex items-center gap-2">
                       <Badge variant={provider.isActive ? 'default' : 'secondary'}>
-                        {provider.isActive ? 'Active' : 'Inactive'}
+                        {provider.isActive ? gt('Active') : gt('Inactive')}
                       </Badge>
                       {provider.authType === 'oauth2' && (
                         <Button
@@ -1148,7 +1157,7 @@ export default function IntegrationPlatformTestPage() {
                           ) : (
                             <>
                               <ExternalLink className="h-3 w-3 mr-1" />
-                              Connect
+                              {gt('Connect')}
                             </>
                           )}
                         </Button>
@@ -1161,7 +1170,7 @@ export default function IntegrationPlatformTestPage() {
 
             <details className="mt-3">
               <summary className="text-xs text-muted-foreground cursor-pointer">
-                Raw Response
+                {gt('Raw Response')}
               </summary>
               <JsonDisplay data={providers} />
             </details>
@@ -1169,7 +1178,7 @@ export default function IntegrationPlatformTestPage() {
 
           {/* OAuth Availability */}
           {oauthProviders.length > 0 && (
-            <DebugSection title="OAuth Credentials Status">
+            <DebugSection title={gt('OAuth Credentials Status')}>
               <div className="space-y-3">
                 {oauthProviders.map((provider) => (
                   <OAuthAvailabilityCard
@@ -1186,7 +1195,7 @@ export default function IntegrationPlatformTestPage() {
 
         {/* Middle Column - Connections */}
         <div>
-          <DebugSection title="Connections">
+          <DebugSection title={gt('Connections')}>
             <div className="flex items-center gap-2 mb-3">
               <Button
                 size="sm"
@@ -1195,16 +1204,16 @@ export default function IntegrationPlatformTestPage() {
                 disabled={connectionsLoading}
               >
                 <RefreshCw className={`h-3 w-3 mr-1 ${connectionsLoading ? 'animate-spin' : ''}`} />
-                Refresh
+                {gt('Refresh')}
               </Button>
               {connectionsLoading && (
-                <span className="text-xs text-muted-foreground">Loading...</span>
+                <span className="text-xs text-muted-foreground">{gt('Loading...')}</span>
               )}
               {connectionsError && <span className="text-xs text-red-500">{connectionsError}</span>}
             </div>
 
             {connections.length === 0 && !connectionsLoading ? (
-              <p className="text-sm text-muted-foreground">No connections found</p>
+              <p className="text-sm text-muted-foreground">{gt('No connections found')}</p>
             ) : (
               <div className="space-y-2">
                 {connections.map((conn) => (
@@ -1220,13 +1229,15 @@ export default function IntegrationPlatformTestPage() {
                     </div>
 
                     <div className="text-xs text-muted-foreground mb-2">
-                      Auth: {conn.authStrategy} • Last sync:{' '}
-                      {conn.lastSyncAt ? new Date(conn.lastSyncAt).toLocaleString() : 'Never'}
+                      {gt('Auth: {auth} • Last sync: {sync}', {
+                        auth: conn.authStrategy,
+                        sync: conn.lastSyncAt ? new Date(conn.lastSyncAt).toLocaleString() : gt('Never')
+                      })}
                     </div>
 
                     {conn.variables && Object.keys(conn.variables).length > 0 && (
                       <div className="text-xs mb-2 p-2 bg-green-500/10 border border-green-500/20 rounded">
-                        <div className="font-medium text-green-600 mb-1">Configured Variables:</div>
+                        <div className="font-medium text-green-600 mb-1">{gt('Configured Variables:')}</div>
                         <div className="space-y-0.5 font-mono">
                           {Object.entries(conn.variables).map(([key, value]) => (
                             <div key={key} className="flex gap-2">
@@ -1262,7 +1273,7 @@ export default function IntegrationPlatformTestPage() {
                         ) : (
                           <>
                             <Play className="h-3 w-3 mr-1" />
-                            Test
+                            {gt('Test')}
                           </>
                         )}
                       </Button>
@@ -1275,7 +1286,7 @@ export default function IntegrationPlatformTestPage() {
                           disabled={isLoading === `pause-${conn.id}`}
                         >
                           <Pause className="h-3 w-3 mr-1" />
-                          Pause
+                          {gt('Pause')}
                         </Button>
                       )}
 
@@ -1287,7 +1298,7 @@ export default function IntegrationPlatformTestPage() {
                           disabled={isLoading === `resume-${conn.id}`}
                         >
                           <Play className="h-3 w-3 mr-1" />
-                          Resume
+                          {gt('Resume')}
                         </Button>
                       )}
 
@@ -1297,7 +1308,7 @@ export default function IntegrationPlatformTestPage() {
                         onClick={() => handleDisconnect(conn.id)}
                         disabled={isLoading === `disconnect-${conn.id}`}
                       >
-                        Disconnect
+                        {gt('Disconnect')}
                       </Button>
 
                       <Button
@@ -1342,7 +1353,7 @@ export default function IntegrationPlatformTestPage() {
 
             <details className="mt-3">
               <summary className="text-xs text-muted-foreground cursor-pointer">
-                Raw Response
+                {gt('Raw Response')}
               </summary>
               <JsonDisplay data={connections} />
             </details>
@@ -1351,10 +1362,10 @@ export default function IntegrationPlatformTestPage() {
 
         {/* Right Column - Logs & Status */}
         <div>
-          <DebugSection title="Action Log">
+          <DebugSection title={gt('Action Log')}>
             <div className="bg-black text-green-400 p-3 rounded-md font-mono text-xs h-80 overflow-auto">
               {actionLog.length === 0 ? (
-                <span className="text-gray-500">No actions yet...</span>
+                <span className="text-gray-500">{gt('No actions yet...')}</span>
               ) : (
                 actionLog.map((entry, i) => (
                   <div key={i} className="mb-1">
@@ -1365,10 +1376,10 @@ export default function IntegrationPlatformTestPage() {
             </div>
           </DebugSection>
 
-          <DebugSection title="API Status">
+          <DebugSection title={gt('API Status')}>
             <div className="space-y-2 text-sm">
               <div className="flex items-center justify-between">
-                <span>Providers API</span>
+                <span>{gt('Providers API')}</span>
                 {providersLoading ? (
                   <Loader2 className="h-4 w-4 animate-spin text-yellow-500" />
                 ) : providersError ? (
@@ -1378,7 +1389,7 @@ export default function IntegrationPlatformTestPage() {
                 )}
               </div>
               <div className="flex items-center justify-between">
-                <span>Connections API</span>
+                <span>{gt('Connections API')}</span>
                 {connectionsLoading ? (
                   <Loader2 className="h-4 w-4 animate-spin text-yellow-500" />
                 ) : connectionsError ? (
@@ -1388,30 +1399,30 @@ export default function IntegrationPlatformTestPage() {
                 )}
               </div>
               <div className="flex items-center justify-between">
-                <span>Providers Count</span>
+                <span>{gt('Providers Count')}</span>
                 <Badge variant="outline">{providers.length}</Badge>
               </div>
               <div className="flex items-center justify-between">
-                <span>Connections Count</span>
+                <span>{gt('Connections Count')}</span>
                 <Badge variant="outline">{connections.length}</Badge>
               </div>
             </div>
           </DebugSection>
 
-          <DebugSection title="Environment">
+          <DebugSection title={gt('Environment')}>
             <div className="text-xs font-mono space-y-1">
               <div>
-                <span className="text-muted-foreground">API_URL: </span>
-                {process.env.NEXT_PUBLIC_API_URL || 'not set'}
+                <span className="text-muted-foreground">{gt('API_URL:')} </span>
+                {process.env.NEXT_PUBLIC_API_URL || gt('not set')}
               </div>
               <div>
-                <span className="text-muted-foreground">Current URL: </span>
+                <span className="text-muted-foreground">{gt('Current URL:')} </span>
                 {typeof window !== 'undefined' ? window.location.href : 'SSR'}
               </div>
             </div>
           </DebugSection>
 
-          <DebugSection title="Quick Actions">
+          <DebugSection title={gt('Quick Actions')}>
             <div className="space-y-2">
               <Button
                 size="sm"
@@ -1424,7 +1435,7 @@ export default function IntegrationPlatformTestPage() {
                 }}
               >
                 <RefreshCw className="h-3 w-3 mr-2" />
-                Refresh All
+                {gt('Refresh All')}
               </Button>
               <Button
                 size="sm"
@@ -1433,7 +1444,7 @@ export default function IntegrationPlatformTestPage() {
                 onClick={() => setActionLog([])}
               >
                 <Trash2 className="h-3 w-3 mr-2" />
-                Clear Log
+                {gt('Clear Log')}
               </Button>
             </div>
           </DebugSection>

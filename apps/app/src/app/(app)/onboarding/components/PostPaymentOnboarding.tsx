@@ -7,6 +7,7 @@ import { Button } from '@comp/ui/button';
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@comp/ui/form';
 import type { Organization } from '@db';
 import { AnimatePresence, motion } from 'framer-motion';
+import { T, useGT, useMessages } from 'gt-next';
 import { Loader2 } from 'lucide-react';
 import { useEffect, useMemo } from 'react';
 import Balancer from 'react-wrap-balancer';
@@ -23,6 +24,9 @@ export function PostPaymentOnboarding({
   initialData = {},
   userEmail,
 }: PostPaymentOnboardingProps) {
+  const gt = useGT();
+  const m = useMessages();
+
   const {
     stepIndex,
     steps,
@@ -115,13 +119,15 @@ export function PostPaymentOnboarding({
         <div className="mb-8">
           <AnimatedWrapper delay={800} animationKey={`title-${step?.key}`}>
             <h1 className="text-2xl md:text-4xl font-bold text-foreground mb-2">
-              <Balancer>{step?.question || ''}</Balancer>
+              <Balancer>{step?.question ? m(step.question) : ''}</Balancer>
             </h1>
           </AnimatedWrapper>
           <AnimatedWrapper delay={1000} animationKey={`subtitle-${step?.key}`}>
-            <p className="text-md md:text-lg text-muted-foreground flex items-center flex-wrap">
-              <Balancer>Our AI will personalize the platform based on your answers.</Balancer>
-            </p>
+            <T>
+              <p className="text-md md:text-lg text-muted-foreground flex items-center flex-wrap">
+                <Balancer>Our AI will personalize the platform based on your answers.</Balancer>
+              </p>
+            </T>
           </AnimatedWrapper>
         </div>
 
@@ -188,7 +194,7 @@ export function PostPaymentOnboarding({
                   onClick={handleBack}
                   disabled={isOnboarding || isLoading}
                 >
-                  Previous
+                  {gt('Previous')}
                 </Button>
               </motion.div>
             )}
@@ -207,7 +213,7 @@ export function PostPaymentOnboarding({
                 onClick={completeNow}
                 disabled={isOnboarding || isFinalizing || isLoading}
               >
-                Complete
+                {gt('Complete')}
               </Button>
             </motion.div>
           )}
@@ -235,7 +241,7 @@ export function PostPaymentOnboarding({
                   className="flex items-center gap-2"
                 >
                   {isOnboarding && <Loader2 className="h-4 w-4 animate-spin" />}
-                  Complete
+                  {gt('Complete')}
                 </motion.span>
               </Button>
             ) : (
@@ -254,7 +260,7 @@ export function PostPaymentOnboarding({
                   transition={{ duration: 0.2 }}
                   className="flex items-center"
                 >
-                  Continue
+                  {gt('Continue')}
                 </motion.span>
               </Button>
             )}

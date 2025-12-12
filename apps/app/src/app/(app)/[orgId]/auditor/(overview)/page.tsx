@@ -8,6 +8,7 @@ import type { Metadata } from 'next';
 import { headers } from 'next/headers';
 import { notFound, redirect } from 'next/navigation';
 import { AuditorView } from './components/AuditorView';
+import { getGT } from 'gt-next/server';
 
 // Helper to safely parse comma-separated roles string
 function parseRolesString(rolesStr: string | null | undefined): Role[] {
@@ -19,13 +20,16 @@ function parseRolesString(rolesStr: string | null | undefined): Role[] {
 }
 
 export async function generateMetadata(): Promise<Metadata> {
+  const gt = await getGT();
   return {
-    title: 'Auditor View',
+    title: gt('Auditor View'),
   };
 }
 
 export default async function AuditorPage({ params }: { params: Promise<{ orgId: string }> }) {
   const { orgId: organizationId } = await params;
+
+  const gt = await getGT();
 
   const session = await auth.api.getSession({
     headers: await headers(),
@@ -72,7 +76,7 @@ export default async function AuditorPage({ params }: { params: Promise<{ orgId:
     }
   }
 
-  // All context questions we need
+  // All context questions we need (these are the database keys - DO NOT translate)
   const CONTEXT_QUESTIONS = [
     // AI-generated sections
     'Company Background & Overview of Operations',
@@ -125,11 +129,11 @@ export default async function AuditorPage({ params }: { params: Promise<{ orgId:
 
   return (
     <PageWithBreadcrumb
-      breadcrumbs={[{ label: 'Auditor View', href: `/${organizationId}/auditor`, current: true }]}
+      breadcrumbs={[{ label: gt('Auditor View'), href: `/${organizationId}/auditor`, current: true }]}
     >
       <AuditorView
         initialContent={initialContent}
-        organizationName={organization?.name ?? 'Organization'}
+        organizationName={organization?.name ?? gt('Organization')}
         logoUrl={logoUrl}
         employeeCount={initialContent['How many employees do you have?'] || null}
         cSuite={cSuiteData}

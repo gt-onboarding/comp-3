@@ -4,6 +4,7 @@ import { completeInvitation } from '@/actions/organization/accept-invitation';
 import { authClient } from '@/utils/auth-client';
 import { Button } from '@comp/ui/button';
 import { Icons } from '@comp/ui/icons';
+import { T, useGT } from 'gt-next';
 import { Loader2 } from 'lucide-react';
 import { useAction } from 'next-safe-action/hooks';
 import Link from 'next/link';
@@ -17,6 +18,7 @@ export function AcceptInvite({
   inviteCode: string;
   organizationName: string;
 }) {
+  const gt = useGT();
   // Using next/navigation redirect to avoid showing invite page after accept
 
   const { execute, isPending } = useAction(completeInvitation, {
@@ -29,7 +31,7 @@ export function AcceptInvite({
       }
     },
     onError: (error) => {
-      toast.error('Failed to accept invitation');
+      toast.error(gt('Failed to accept invitation'));
     },
   });
 
@@ -47,25 +49,29 @@ export function AcceptInvite({
       </div>
 
       <div className="mb-8 space-y-1.5 text-center">
-        <h1 className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-          You have been invited to join
-        </h1>
+        <T>
+          <h1 className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+            You have been invited to join
+          </h1>
+        </T>
         <p className="text-2xl font-semibold tracking-tight line-clamp-1">
-          {organizationName || 'an organization'}
+          {organizationName || gt('an organization')}
         </p>
-        <p className="text-muted-foreground text-sm">
-          Please accept the invitation to join the organization.
-        </p>
+        <T>
+          <p className="text-muted-foreground text-sm">
+            Please accept the invitation to join the organization.
+          </p>
+        </T>
       </div>
 
       <Button onClick={handleAccept} className="w-full" size="sm" disabled={isPending}>
         {isPending ? (
           <>
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            Accepting...
+            {gt('Accepting...')}
           </>
         ) : (
-          'Accept Invitation'
+          gt('Accept Invitation')
         )}
       </Button>
     </div>

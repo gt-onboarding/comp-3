@@ -45,6 +45,7 @@ import {
 } from '../data/integrations';
 import { SearchInput } from './SearchInput';
 import { TaskCard, TaskCardSkeleton } from './TaskCard';
+import { T, useGT, useMessages } from 'gt-next';
 
 const LOGO_TOKEN = 'pk_AZatYxV5QDSfWpRDaBxzRQ';
 
@@ -85,6 +86,8 @@ export function PlatformIntegrations({ className, taskTemplates }: PlatformInteg
     refresh: refreshConnections,
   } = useIntegrationConnections();
   const { startOAuth } = useIntegrationMutations();
+  const gt = useGT();
+  const m = useMessages();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<IntegrationCategory | 'All'>('All');
@@ -119,11 +122,11 @@ export function PlatformIntegrations({ className, taskTemplates }: PlatformInteg
         if (result.authorizationUrl) {
           window.location.href = result.authorizationUrl;
         } else {
-          toast.error(result.error || 'Failed to start connection');
+          toast.error(result.error || gt('Failed to start connection'));
           setConnectingProvider(null);
         }
       } catch {
-        toast.error('Failed to start connection');
+        toast.error(gt('Failed to start connection'));
         setConnectingProvider(null);
       }
       return;
@@ -262,7 +265,7 @@ export function PlatformIntegrations({ className, taskTemplates }: PlatformInteg
 
     if (connection && provider) {
       console.log('[OAuth] Found connection and provider, opening dialog');
-      toast.success(`${provider.name} connected successfully!`);
+      toast.success(gt('{providerName} connected successfully!', { providerName: provider.name }));
 
       // Set state first
       setSelectedConnection(connection);
@@ -311,7 +314,7 @@ export function PlatformIntegrations({ className, taskTemplates }: PlatformInteg
 
   const handleCopyPrompt = (prompt: string) => {
     navigator.clipboard.writeText(prompt);
-    toast.success('Prompt copied to clipboard!');
+    toast.success(gt('Prompt copied to clipboard!'));
   };
 
   if (loadingProviders || loadingConnections) {
@@ -352,7 +355,7 @@ export function PlatformIntegrations({ className, taskTemplates }: PlatformInteg
           <SearchInput
             value={searchQuery}
             onChange={setSearchQuery}
-            placeholder="Search integrations..."
+            placeholder={gt('Search integrations...')}
             className="w-full max-w-md"
           />
 
@@ -363,7 +366,7 @@ export function PlatformIntegrations({ className, taskTemplates }: PlatformInteg
               onClick={() => setSelectedCategory('All')}
               className="flex-shrink-0 whitespace-nowrap min-w-fit px-4"
             >
-              All
+              {gt('All')}
             </Button>
             {allCategories.map((category) => (
               <Button
@@ -373,7 +376,7 @@ export function PlatformIntegrations({ className, taskTemplates }: PlatformInteg
                 onClick={() => setSelectedCategory(category as IntegrationCategory)}
                 className="flex-shrink-0 whitespace-nowrap min-w-fit px-4"
               >
-                {category}
+                {m(category)}
               </Button>
             ))}
           </div>
@@ -382,8 +385,9 @@ export function PlatformIntegrations({ className, taskTemplates }: PlatformInteg
         {/* Results info */}
         {(searchQuery || selectedCategory !== 'All') && filteredIntegrations.length > 0 && (
           <div className="text-sm text-muted-foreground">
-            Showing {filteredIntegrations.length}{' '}
-            {filteredIntegrations.length === 1 ? 'integration' : 'integrations'}
+            {gt('Showing {count} {count, plural, one {integration} other {integrations}}', {
+              count: filteredIntegrations.length,
+            })}
           </div>
         )}
 
@@ -442,7 +446,7 @@ export function PlatformIntegrations({ className, taskTemplates }: PlatformInteg
                             <div className="flex items-center gap-2 mt-0.5">
                               <p className="text-xs text-muted-foreground">{provider.category}</p>
                               <Badge variant="secondary" className="text-[10px] px-1.5 py-0">
-                                Platform
+                                {gt('Platform')}
                               </Badge>
                             </div>
                           </div>
@@ -482,7 +486,7 @@ export function PlatformIntegrations({ className, taskTemplates }: PlatformInteg
                                 variant="outline"
                                 className="text-[10px] px-1.5 py-0.5 font-normal"
                               >
-                                +{provider.mappedTasks.length - 3} more
+                                {gt('+{count} more', { count: provider.mappedTasks.length - 3 })}
                               </Badge>
                             )}
                           </div>
@@ -497,12 +501,12 @@ export function PlatformIntegrations({ className, taskTemplates }: PlatformInteg
                             className="w-full"
                             onClick={() => handleOpenManageDialog(connection, provider)}
                           >
-                            Configure Variables
+                            {gt('Configure Variables')}
                           </Button>
                         ) : isConnected ? null : hasError ? (
                           <div className="space-y-2 pt-2 border-t border-border/50">
                             <p className="text-xs text-destructive line-clamp-1">
-                              {connection?.errorMessage || 'Connection error'}
+                              {connection?.errorMessage || gt('Connection error')}
                             </p>
                             <Button
                               size="sm"
@@ -514,16 +518,16 @@ export function PlatformIntegrations({ className, taskTemplates }: PlatformInteg
                               {isConnecting ? (
                                 <>
                                   <Loader2 className="h-3 w-3 mr-2 animate-spin" />
-                                  Reconnecting...
+                                  {gt('Reconnecting...')}
                                 </>
                               ) : (
-                                'Reconnect'
+                                gt('Reconnect')
                               )}
                             </Button>
                           </div>
                         ) : provider.authType === 'oauth2' && provider.oauthConfigured === false ? (
                           <Button size="sm" variant="outline" className="w-full" disabled>
-                            Coming Soon
+                            {gt('Coming Soon')}
                           </Button>
                         ) : (
                           <Button
@@ -535,10 +539,10 @@ export function PlatformIntegrations({ className, taskTemplates }: PlatformInteg
                             {isConnecting ? (
                               <>
                                 <Loader2 className="h-3 w-3 mr-2 animate-spin" />
-                                Connecting...
+                                {gt('Connecting...')}
                               </>
                             ) : (
-                              'Connect'
+                              gt('Connect')
                             )}
                           </Button>
                         )}
@@ -574,7 +578,7 @@ export function PlatformIntegrations({ className, taskTemplates }: PlatformInteg
                             {integration.name}
                             {integration.popular && (
                               <Badge variant="outline" className="text-[10px] px-1.5 py-0">
-                                Popular
+                                {gt('Popular')}
                               </Badge>
                             )}
                           </CardTitle>
@@ -584,7 +588,7 @@ export function PlatformIntegrations({ className, taskTemplates }: PlatformInteg
                               variant="outline"
                               className="text-[10px] px-1.5 py-0 border-dashed"
                             >
-                              AI Agent
+                              {gt('AI Agent')}
                             </Badge>
                           </div>
                         </div>
@@ -610,48 +614,59 @@ export function PlatformIntegrations({ className, taskTemplates }: PlatformInteg
                   <Sparkles className="w-8 h-8 text-primary" />
                 </div>
                 <div className="space-y-2">
-                  <h3 className="text-xl font-semibold text-foreground">Just ask the agent</h3>
+                  <T>
+                    <h3 className="text-xl font-semibold text-foreground">Just ask the agent</h3>
+                  </T>
                   <p className="text-sm text-muted-foreground leading-relaxed max-w-md mx-auto">
                     {searchQuery ? (
-                      <>
-                        "{searchQuery}" isn't in our directory, but the agent can connect to it
-                        anyway. Describe what you need in natural language.
-                      </>
+                      gt(
+                        '"{searchQuery}" isn\'t in our directory, but the agent can connect to it anyway. Describe what you need in natural language.',
+                        { searchQuery },
+                      )
                     ) : (
-                      <>
-                        The agent can integrate with any system—you're not limited to this
-                        directory.
-                      </>
+                      gt(
+                        'The agent can integrate with any system—you\'re not limited to this directory.',
+                      )
                     )}
                   </p>
                 </div>
               </div>
 
               <div className="p-5 rounded-xl bg-background border border-border text-left space-y-3">
-                <p className="text-sm font-medium text-foreground">Example for your search:</p>
+                <T>
+                  <p className="text-sm font-medium text-foreground">Example for your search:</p>
+                </T>
                 <div className="space-y-2">
                   <button
                     onClick={() =>
                       handleCopyPrompt(
-                        `Connect to ${searchQuery || 'our system'} and check security settings`,
+                        gt('Connect to {system} and check security settings', {
+                          system: searchQuery || gt('our system'),
+                        }),
                       )
                     }
                     className="w-full p-3 rounded-lg bg-muted/50 border border-border hover:border-primary/30 transition-colors text-left group"
                   >
                     <p className="text-sm text-foreground/80 group-hover:text-foreground">
-                      "Connect to {searchQuery || 'our system'} and check security settings"
+                      "{gt('Connect to {system} and check security settings', {
+                        system: searchQuery || gt('our system'),
+                      })}"
                     </p>
                   </button>
                   <button
                     onClick={() =>
                       handleCopyPrompt(
-                        `Pull compliance data from ${searchQuery || 'our internal tool'}`,
+                        gt('Pull compliance data from {tool}', {
+                          tool: searchQuery || gt('our internal tool'),
+                        }),
                       )
                     }
                     className="w-full p-3 rounded-lg bg-muted/50 border border-border hover:border-primary/30 transition-colors text-left group"
                   >
                     <p className="text-sm text-foreground/80 group-hover:text-foreground">
-                      "Pull compliance data from {searchQuery || 'our internal tool'}"
+                      "{gt('Pull compliance data from {tool}', {
+                        tool: searchQuery || gt('our internal tool'),
+                      })}"
                     </p>
                   </button>
                 </div>
@@ -659,7 +674,7 @@ export function PlatformIntegrations({ className, taskTemplates }: PlatformInteg
                   href={`/${orgId}/tasks`}
                   className="flex items-center justify-center gap-2 text-sm text-primary hover:text-primary/80 font-medium pt-2"
                 >
-                  Go to Tasks to get started
+                  {gt('Go to Tasks to get started')}
                   <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
               </div>
@@ -672,7 +687,7 @@ export function PlatformIntegrations({ className, taskTemplates }: PlatformInteg
                   }}
                   className="text-sm text-muted-foreground hover:text-foreground font-medium"
                 >
-                  ← Browse all integrations
+                  {gt('← Browse all integrations')}
                 </button>
               )}
             </div>
@@ -743,11 +758,11 @@ export function PlatformIntegrations({ className, taskTemplates }: PlatformInteg
                         </DialogTitle>
                         {selectedCustomIntegration.popular && (
                           <Badge variant="secondary" className="text-[10px] px-2 py-0.5">
-                            Popular
+                            {gt('Popular')}
                           </Badge>
                         )}
                         <Badge variant="outline" className="text-[10px] px-2 py-0.5 border-dashed">
-                          AI Agent
+                          {gt('AI Agent')}
                         </Badge>
                       </div>
                       <div className="flex items-center gap-2">
@@ -769,20 +784,24 @@ export function PlatformIntegrations({ className, taskTemplates }: PlatformInteg
                     <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
                       <Plug className="w-4 h-4 text-primary" />
                     </div>
-                    <h4 className="text-base font-semibold text-foreground">How to Connect</h4>
+                    <T>
+                      <h4 className="text-base font-semibold text-foreground">How to Connect</h4>
+                    </T>
                   </div>
                   <div className="p-5 rounded-xl bg-gradient-to-br from-muted/80 to-muted/40 border border-border/50 shadow-sm space-y-3">
                     <p className="text-sm text-foreground leading-relaxed">
-                      Click on any relevant task below to create an automation with{' '}
-                      {selectedCustomIntegration.name}. The automation will be pre-configured with a
-                      prompt tailored to that task. The agent will ask you for the necessary
-                      permissions and API keys if required.
+                      {gt(
+                        'Click on any relevant task below to create an automation with {integrationName}. The automation will be pre-configured with a prompt tailored to that task. The agent will ask you for the necessary permissions and API keys if required.',
+                        { integrationName: selectedCustomIntegration.name },
+                      )}
                     </p>
                     {selectedCustomIntegration.setupHint && (
                       <div className="flex items-start gap-2 pt-2 border-t border-border/50">
                         <CheckCircle2 className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
                         <p className="text-xs text-muted-foreground">
-                          <span className="font-medium text-foreground">Typically requires:</span>{' '}
+                          <T>
+                            <span className="font-medium text-foreground">Typically requires:</span>
+                          </T>{' '}
                           {selectedCustomIntegration.setupHint}
                         </p>
                       </div>
@@ -795,7 +814,9 @@ export function PlatformIntegrations({ className, taskTemplates }: PlatformInteg
                     <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
                       <Zap className="w-4 h-4 text-primary" />
                     </div>
-                    <h4 className="text-base font-semibold text-foreground">Relevant Tasks</h4>
+                    <T>
+                      <h4 className="text-base font-semibold text-foreground">Relevant Tasks</h4>
+                    </T>
                   </div>
                   {isLoadingTasks ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -811,9 +832,11 @@ export function PlatformIntegrations({ className, taskTemplates }: PlatformInteg
                     </div>
                   ) : (
                     <div className="p-5 rounded-xl bg-muted/50 border border-border/50">
-                      <p className="text-sm text-muted-foreground text-center">
-                        No relevant tasks found for this integration.
-                      </p>
+                      <T>
+                        <p className="text-sm text-muted-foreground text-center">
+                          No relevant tasks found for this integration.
+                        </p>
+                      </T>
                     </div>
                   )}
                 </div>

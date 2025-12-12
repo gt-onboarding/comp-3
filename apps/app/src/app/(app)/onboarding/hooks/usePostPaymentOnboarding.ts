@@ -6,6 +6,7 @@ import { companyDetailsSchema, steps } from '@/app/(app)/setup/lib/constants';
 import type { CompanyDetails } from '@/app/(app)/setup/lib/types';
 import { trackEvent, trackOnboardingEvent } from '@/utils/tracking';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useGT } from 'gt-next';
 import { useAction } from 'next-safe-action/hooks';
 import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
@@ -49,6 +50,7 @@ export function usePostPaymentOnboarding({
   userEmail,
 }: UsePostPaymentOnboardingProps) {
   const router = useRouter();
+  const gt = useGT();
 
   // Get filtered steps based on user
   const postPaymentSteps = useMemo(() => getPostPaymentSteps(userEmail), [userEmail]);
@@ -129,13 +131,13 @@ export function usePostPaymentOnboarding({
         // Redirect to the organization dashboard
         router.push(data.redirectUrl);
       } else {
-        toast.error('Failed to complete onboarding');
+        toast.error(gt('Failed to complete onboarding'));
         setIsFinalizing(false);
         setIsOnboarding(false);
       }
     },
     onError: () => {
-      toast.error('Failed to complete onboarding');
+      toast.error(gt('Failed to complete onboarding'));
       setIsFinalizing(false);
       setIsOnboarding(false);
     },

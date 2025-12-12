@@ -2,9 +2,11 @@
 
 import { auth as betterAuth } from '@/utils/auth';
 import { auth } from '@trigger.dev/sdk';
+import { getGT } from 'gt-next/server';
 import { headers } from 'next/headers';
 
 export const createTriggerToken = async () => {
+  const gt = await getGT();
   const session = await betterAuth.api.getSession({
     headers: await headers(),
   });
@@ -12,7 +14,7 @@ export const createTriggerToken = async () => {
   if (!session) {
     return {
       success: false,
-      error: 'Unauthorized',
+      error: gt('Unauthorized'),
     };
   }
 
@@ -20,7 +22,7 @@ export const createTriggerToken = async () => {
   if (!orgId) {
     return {
       success: false,
-      error: 'No active organization',
+      error: gt('No active organization'),
     };
   }
 
@@ -38,7 +40,7 @@ export const createTriggerToken = async () => {
     console.error('Error creating trigger token:', error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Failed to create trigger token',
+      error: error instanceof Error ? error.message : gt('Failed to create trigger token'),
     };
   }
 };

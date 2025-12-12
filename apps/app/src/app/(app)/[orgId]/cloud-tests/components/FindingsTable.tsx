@@ -5,6 +5,7 @@ import { Button } from '@comp/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@comp/ui/table';
 import { ChevronDown, ChevronRight } from 'lucide-react';
 import { useState } from 'react';
+import { T, useGT, DateTime } from 'gt-next';
 
 interface Finding {
   id: string;
@@ -39,6 +40,7 @@ const statusVariant = {
 } as const;
 
 export function FindingsTable({ findings }: FindingsTableProps) {
+  const gt = useGT();
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
 
   const toggleRow = (id: string) => {
@@ -56,7 +58,9 @@ export function FindingsTable({ findings }: FindingsTableProps) {
   if (findings.length === 0) {
     return (
       <div className="rounded-xs border p-12 text-center">
-        <p className="text-muted-foreground text-lg">No findings available</p>
+        <T>
+          <p className="text-muted-foreground text-lg">No findings available</p>
+        </T>
       </div>
     );
   }
@@ -67,10 +71,18 @@ export function FindingsTable({ findings }: FindingsTableProps) {
         <TableHeader>
           <TableRow>
             <TableHead className="w-[50px]"></TableHead>
-            <TableHead className="w-[120px]">Severity</TableHead>
-            <TableHead>Title</TableHead>
-            <TableHead className="w-[150px]">Status</TableHead>
-            <TableHead className="w-[180px]">Detected At</TableHead>
+            <TableHead className="w-[120px]">
+              <T>Severity</T>
+            </TableHead>
+            <TableHead>
+              <T>Title</T>
+            </TableHead>
+            <TableHead className="w-[150px]">
+              <T>Status</T>
+            </TableHead>
+            <TableHead className="w-[180px]">
+              <T>Detected At</T>
+            </TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -97,19 +109,23 @@ export function FindingsTable({ findings }: FindingsTableProps) {
                   </TableCell>
                   <TableCell>
                     <Badge variant={severityVariant[severityKey] || 'default'}>
-                      {finding.severity || 'Unknown'}
+                      {finding.severity || gt('Unknown')}
                     </Badge>
                   </TableCell>
                   <TableCell className="font-medium">
-                    {finding.title || 'Untitled Finding'}
+                    {finding.title || gt('Untitled Finding')}
                   </TableCell>
                   <TableCell>
                     <Badge variant={statusVariant[statusKey] || 'secondary'}>
-                      {finding.status === 'success' ? 'Passed' : finding.status || 'Unknown'}
+                      {finding.status === 'success' ? gt('Passed') : finding.status || gt('Unknown')}
                     </Badge>
                   </TableCell>
                   <TableCell className="text-muted-foreground text-sm">
-                    {finding.completedAt ? new Date(finding.completedAt).toLocaleString() : 'Never'}
+                    {finding.completedAt ? (
+                      <DateTime>{new Date(finding.completedAt)}</DateTime>
+                    ) : (
+                      gt('Never')
+                    )}
                   </TableCell>
                 </TableRow>
                 {isExpanded && (
@@ -118,13 +134,17 @@ export function FindingsTable({ findings }: FindingsTableProps) {
                       <div className="space-y-4 p-4">
                         {finding.description && (
                           <div>
-                            <h4 className="mb-2 font-semibold">Description</h4>
+                            <T>
+                              <h4 className="mb-2 font-semibold">Description</h4>
+                            </T>
                             <p className="text-muted-foreground text-sm">{finding.description}</p>
                           </div>
                         )}
                         {finding.remediation && (
                           <div>
-                            <h4 className="mb-2 font-semibold">Remediation</h4>
+                            <T>
+                              <h4 className="mb-2 font-semibold">Remediation</h4>
+                            </T>
                             <div className="text-muted-foreground text-sm">
                               {finding.remediation.split(/\b(https?:\/\/\S+)\b/).map((part, i) => {
                                 return /^https?:\/\/\S+$/.test(part) ? (

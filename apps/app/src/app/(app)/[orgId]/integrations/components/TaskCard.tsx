@@ -6,6 +6,7 @@ import { ArrowRight, Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { toast } from 'sonner';
+import { T, useGT } from 'gt-next';
 
 interface RelevantTask {
   taskTemplateId: string;
@@ -17,10 +18,11 @@ interface RelevantTask {
 export function TaskCard({ task, orgId }: { task: RelevantTask; orgId: string }) {
   const [isNavigating, setIsNavigating] = useState(false);
   const router = useRouter();
+  const gt = useGT();
 
   const handleCardClick = async () => {
     setIsNavigating(true);
-    toast.loading('Opening task automation...', { id: 'navigating' });
+    toast.loading(gt('Opening task automation...'), { id: 'navigating' });
 
     try {
       const response = await api.get<Array<{ id: string; taskTemplateId: string | null }>>(
@@ -38,7 +40,7 @@ export function TaskCard({ task, orgId }: { task: RelevantTask; orgId: string })
 
       if (!matchingTask) {
         toast.dismiss('navigating');
-        toast.error(`Task "${task.taskName}" not found. Please create it first.`);
+        toast.error(gt('Task "{taskName}" not found. Please create it first.', { taskName: task.taskName }));
         setIsNavigating(false);
         await router.push(`/${orgId}/tasks`);
         return;
@@ -46,13 +48,13 @@ export function TaskCard({ task, orgId }: { task: RelevantTask; orgId: string })
 
       const url = `/${orgId}/tasks/${matchingTask.id}/automation/new?prompt=${encodeURIComponent(task.prompt)}`;
       toast.dismiss('navigating');
-      toast.success('Redirecting...', { duration: 1000 });
+      toast.success(gt('Redirecting...'), { duration: 1000 });
 
       window.location.href = url;
     } catch (error) {
       console.error('Error finding task:', error);
       toast.dismiss('navigating');
-      toast.error('Failed to find task');
+      toast.error(gt('Failed to find task'));
       setIsNavigating(false);
     }
   };
@@ -66,10 +68,14 @@ export function TaskCard({ task, orgId }: { task: RelevantTask; orgId: string })
         <div className="absolute inset-0 bg-background/80 backdrop-blur-sm z-10 flex flex-col items-center justify-center gap-3 rounded-xl">
           <Loader2 className="w-6 h-6 animate-spin text-primary" />
           <div className="text-center space-y-1">
-            <p className="text-sm font-medium text-foreground">Opening task...</p>
-            <p className="text-xs text-muted-foreground">
-              Redirecting to automation with prompt pre-filled
-            </p>
+            <T>
+              <p className="text-sm font-medium text-foreground">Opening task...</p>
+            </T>
+            <T>
+              <p className="text-xs text-muted-foreground">
+                Redirecting to automation with prompt pre-filled
+              </p>
+            </T>
           </div>
         </div>
       )}

@@ -8,6 +8,7 @@
  * - Easy to add new integrations category-by-category
  */
 
+import { msg } from 'gt-next';
 import { cloudIntegrations } from './categories/cloud';
 import { communicationIntegrations } from './categories/communication';
 import { developmentIntegrations } from './categories/development';
@@ -51,11 +52,11 @@ export const INTEGRATIONS: Integration[] = [
 ];
 
 export const CATEGORIES: IntegrationCategory[] = [
-  'Identity & Access',
-  'HR & People',
-  'Cloud Security',
-  'Development',
-  'Communication',
-  'Monitoring',
-  'Infrastructure',
+  msg('Identity & Access'),
+  msg('HR & People'),
+  msg('Cloud Security'),
+  msg('Development'),
+  msg('Communication'),
+  msg('Monitoring'),
+  msg('Infrastructure'),
 ];

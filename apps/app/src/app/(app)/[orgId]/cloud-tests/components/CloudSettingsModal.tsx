@@ -11,6 +11,7 @@ import {
   DialogTitle,
 } from '@comp/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@comp/ui/tabs';
+import { T, Var, useGT } from 'gt-next';
 import { Loader2, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
@@ -37,11 +38,12 @@ export function CloudSettingsModal({
   const [activeTab, setActiveTab] = useState<string>(connectedProviders[0]?.id || 'aws');
   const [isDeleting, setIsDeleting] = useState(false);
   const { disconnectConnection } = useIntegrationMutations();
+  const gt = useGT();
 
   const handleDisconnect = async (provider: CloudProvider) => {
     if (
       !confirm(
-        'Are you sure you want to disconnect this cloud provider? All scan results will be deleted.',
+        gt('Are you sure you want to disconnect this cloud provider? All scan results will be deleted.'),
       )
     ) {
       return;
@@ -52,15 +54,15 @@ export function CloudSettingsModal({
       const result = await disconnectConnection(provider.connectionId);
 
       if (result.success) {
-        toast.success('Cloud provider disconnected');
+        toast.success(gt('Cloud provider disconnected'));
         onUpdate();
         onOpenChange(false);
       } else {
-        toast.error(result.error || 'Failed to disconnect');
+        toast.error(result.error || gt('Failed to disconnect'));
       }
     } catch (error) {
       console.error('Disconnect error:', error);
-      toast.error('An unexpected error occurred');
+      toast.error(gt('An unexpected error occurred'));
     } finally {
       setIsDeleting(false);
     }
@@ -74,10 +76,14 @@ export function CloudSettingsModal({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl">
         <DialogHeader>
-          <DialogTitle>Manage Cloud Connections</DialogTitle>
-          <DialogDescription>
-            Manage your cloud provider connections. To update credentials, disconnect and reconnect.
-          </DialogDescription>
+          <T>
+            <DialogTitle>Manage Cloud Connections</DialogTitle>
+          </T>
+          <T>
+            <DialogDescription>
+              Manage your cloud provider connections. To update credentials, disconnect and reconnect.
+            </DialogDescription>
+          </T>
         </DialogHeader>
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
@@ -95,19 +101,27 @@ export function CloudSettingsModal({
           {connectedProviders.map((provider) => (
             <TabsContent key={provider.id} value={provider.id} className="space-y-4">
               <div className="bg-muted/50 rounded-lg border p-4">
-                <p className="text-muted-foreground text-sm">
-                  {provider.name} is connected. Credentials are securely stored using IAM Role assumption.
-                </p>
+                <T>
+                  <p className="text-muted-foreground text-sm">
+                    <Var>{provider.name}</Var> is connected. Credentials are securely stored using IAM Role assumption.
+                  </p>
+                </T>
               </div>
 
               <div className="rounded-lg border p-4 space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">Connection Status</span>
-                  <span className="text-sm text-green-600 dark:text-green-400">Active</span>
+                  <T>
+                    <span className="text-sm font-medium">Connection Status</span>
+                  </T>
+                  <T>
+                    <span className="text-sm text-green-600 dark:text-green-400">Active</span>
+                  </T>
                 </div>
-                <p className="text-xs text-muted-foreground">
-                  To update credentials, disconnect this provider and reconnect with new IAM role settings.
-                </p>
+                <T>
+                  <p className="text-xs text-muted-foreground">
+                    To update credentials, disconnect this provider and reconnect with new IAM role settings.
+                  </p>
+                </T>
               </div>
 
               <DialogFooter className="flex justify-end">
@@ -117,15 +131,15 @@ export function CloudSettingsModal({
                   disabled={isDeleting}
                 >
                   {isDeleting ? (
-                    <>
+                    <T>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                       Disconnecting...
-                    </>
+                    </T>
                   ) : (
-                    <>
+                    <T>
                       <Trash2 className="mr-2 h-4 w-4" />
                       Disconnect
-                    </>
+                    </T>
                   )}
                 </Button>
               </DialogFooter>

@@ -7,6 +7,7 @@ import { Label } from '@comp/ui/label';
 import { ExternalLink, Loader2 } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
+import { T, useGT } from 'gt-next';
 import { connectCloudAction } from '../actions/connect-cloud';
 
 interface CloudField {
@@ -46,6 +47,7 @@ export function CloudConnectionCard({
   logoUrl,
   onSuccess,
 }: CloudConnectionCardProps) {
+  const gt = useGT();
   const [isConnecting, setIsConnecting] = useState(false);
   const [credentials, setCredentials] = useState<Record<string, string>>({});
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -65,7 +67,7 @@ export function CloudConnectionCard({
     const newErrors: Record<string, string> = {};
     fields.forEach((field) => {
       if (!credentials[field.id]?.trim()) {
-        newErrors[field.id] = 'Required';
+        newErrors[field.id] = gt('Required');
       }
     });
     setErrors(newErrors);
@@ -74,7 +76,7 @@ export function CloudConnectionCard({
 
   const handleConnect = async () => {
     if (!validateFields()) {
-      toast.error('Please fill in all required fields');
+      toast.error(gt('Please fill in all required fields'));
       return;
     }
 
@@ -86,19 +88,19 @@ export function CloudConnectionCard({
       });
 
       if (result?.data?.success) {
-        toast.success(`${name} connected! Running initial scan...`);
+        toast.success(gt('{name} connected! Running initial scan...', { name }));
         setCredentials({});
         onSuccess?.(result.data?.trigger);
 
         if (result.data?.runErrors && result.data.runErrors.length > 0) {
-          toast.error(result.data.runErrors[0] || 'Initial scan reported an issue');
+          toast.error(result.data.runErrors[0] || gt('Initial scan reported an issue'));
         }
       } else {
-        toast.error(result?.data?.error || 'Failed to connect');
+        toast.error(result?.data?.error || gt('Failed to connect'));
       }
     } catch (error) {
       console.error('Connection error:', error);
-      toast.error('An unexpected error occurred');
+      toast.error(gt('An unexpected error occurred'));
     } finally {
       setIsConnecting(false);
     }
@@ -128,7 +130,7 @@ export function CloudConnectionCard({
             className="text-primary hover:underline flex items-center gap-1 text-xs"
           >
             <ExternalLink className="h-3 w-3" />
-            Setup guide
+            <T>Setup guide</T>
           </a>
         )}
       </CardHeader>
@@ -137,7 +139,9 @@ export function CloudConnectionCard({
           <div key={field.id} className="space-y-1.5">
             <Label htmlFor={field.id} className="text-sm">
               {field.label}
-              <span className="text-destructive ml-1">*</span>
+              <T>
+                <span className="text-destructive ml-1">*</span>
+              </T>
             </Label>
             {field.type === 'textarea' ? (
               <textarea
@@ -168,10 +172,10 @@ export function CloudConnectionCard({
           {isConnecting ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Connecting...
+              <T>Connecting...</T>
             </>
           ) : (
-            'Connect'
+            <T>Connect</T>
           )}
         </Button>
       </CardContent>

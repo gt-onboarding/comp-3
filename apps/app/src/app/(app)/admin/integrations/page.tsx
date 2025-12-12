@@ -6,6 +6,7 @@ import { Button } from '@comp/ui/button';
 import { Card, CardContent } from '@comp/ui/card';
 import { Input } from '@comp/ui/input';
 import { Label } from '@comp/ui/label';
+import { T, useGT } from 'gt-next';
 import {
   CheckCircle2,
   ExternalLink,
@@ -58,6 +59,7 @@ function IntegrationCard({
   integration: Integration;
   onRefresh: () => void;
 }) {
+  const gt = useGT();
   const [showConfig, setShowConfig] = useState(false);
   const [clientId, setClientId] = useState('');
   const [clientSecret, setClientSecret] = useState('');
@@ -102,7 +104,7 @@ function IntegrationCard({
   };
 
   const handleDelete = async () => {
-    if (!confirm(`Delete credentials for ${integration.name}?`)) return;
+    if (!confirm(gt('Delete credentials for {name}?', { name: integration.name }))) return;
 
     setIsDeleting(true);
     setError(null);
@@ -142,9 +144,11 @@ function IntegrationCard({
               <div className="flex items-center gap-2">
                 <h3 className="font-semibold text-sm truncate">{integration.name}</h3>
                 {!integration.hasCredentials && (
-                  <Badge variant="secondary" className="text-[10px] px-1.5 py-0">
-                    Not configured
-                  </Badge>
+                  <T>
+                    <Badge variant="secondary" className="text-[10px] px-1.5 py-0">
+                      Not configured
+                    </Badge>
+                  </T>
                 )}
               </div>
               <p className="text-xs text-muted-foreground line-clamp-2 mt-0.5">
@@ -160,7 +164,7 @@ function IntegrationCard({
             </Badge>
             <span className="uppercase tracking-wide">{integration.authType}</span>
             {integration.hasCredentials && integration.credentialUpdatedAt && (
-              <span>Updated {new Date(integration.credentialUpdatedAt).toLocaleDateString()}</span>
+              <span>{gt('Updated {date}', { date: new Date(integration.credentialUpdatedAt).toLocaleDateString() })}</span>
             )}
           </div>
 
@@ -169,7 +173,7 @@ function IntegrationCard({
               <div className="flex gap-2">
                 <Button size="sm" variant="outline" onClick={() => setShowConfig(!showConfig)}>
                   <Settings className="h-3 w-3 mr-1" />
-                  {showConfig ? 'Hide' : 'Configure'}
+                  {showConfig ? gt('Hide') : gt('Configure')}
                 </Button>
 
                 {integration.hasCredentials && (
@@ -184,7 +188,7 @@ function IntegrationCard({
                     ) : (
                       <Trash2 className="h-3 w-3 mr-1" />
                     )}
-                    Delete
+                    {gt('Delete')}
                   </Button>
                 )}
 
@@ -192,7 +196,7 @@ function IntegrationCard({
                   <a href={integration.createAppUrl} target="_blank" rel="noopener noreferrer">
                     <Button size="sm" variant="ghost">
                       <ExternalLink className="h-3 w-3 mr-1" />
-                      Create OAuth App
+                      {gt('Create OAuth App')}
                     </Button>
                   </a>
                 )}
@@ -206,9 +210,11 @@ function IntegrationCard({
 
                   {integration.setupInstructions && (
                     <details className="text-sm">
-                      <summary className="cursor-pointer text-muted-foreground font-medium">
-                        Setup Instructions
-                      </summary>
+                      <T>
+                        <summary className="cursor-pointer text-muted-foreground font-medium">
+                          Setup Instructions
+                        </summary>
+                      </T>
                       <pre className="mt-2 p-3 bg-muted rounded text-xs whitespace-pre-wrap">
                         {integration.setupInstructions}
                       </pre>
@@ -217,7 +223,9 @@ function IntegrationCard({
 
                   {integration.requiredScopes && integration.requiredScopes.length > 0 && (
                     <div className="text-sm">
-                      <span className="font-medium">Required Scopes: </span>
+                      <T>
+                        <span className="font-medium">Required Scopes: </span>
+                      </T>
                       <code className="text-xs bg-muted px-1 py-0.5 rounded">
                         {integration.requiredScopes.join(', ')}
                       </code>
@@ -226,20 +234,24 @@ function IntegrationCard({
 
                   <div className="grid gap-3">
                     <div>
-                      <Label className="text-sm">Client ID</Label>
+                      <T>
+                        <Label className="text-sm">Client ID</Label>
+                      </T>
                       <Input
                         className="font-mono text-sm"
-                        placeholder="Enter OAuth Client ID"
+                        placeholder={gt('Enter OAuth Client ID')}
                         value={clientId}
                         onChange={(e) => setClientId(e.target.value)}
                       />
                     </div>
                     <div>
-                      <Label className="text-sm">Client Secret</Label>
+                      <T>
+                        <Label className="text-sm">Client Secret</Label>
+                      </T>
                       <Input
                         type="password"
                         className="font-mono text-sm"
-                        placeholder="Enter OAuth Client Secret"
+                        placeholder={gt('Enter OAuth Client Secret')}
                         value={clientSecret}
                         onChange={(e) => setClientSecret(e.target.value)}
                       />
@@ -249,9 +261,11 @@ function IntegrationCard({
                     {additionalSettings.length > 0 && (
                       <>
                         <div className="border-t pt-3 mt-1">
-                          <h4 className="text-xs font-medium text-muted-foreground mb-3 uppercase tracking-wide">
-                            Additional OAuth Settings
-                          </h4>
+                          <T>
+                            <h4 className="text-xs font-medium text-muted-foreground mb-3 uppercase tracking-wide">
+                              Additional OAuth Settings
+                            </h4>
+                          </T>
                         </div>
                         {additionalSettings.map((setting) => (
                           <div key={setting.id}>
@@ -295,7 +309,7 @@ function IntegrationCard({
                     ) : (
                       <Key className="h-4 w-4 mr-2" />
                     )}
-                    Save Credentials
+                    {gt('Save Credentials')}
                   </Button>
                 </div>
               )}
@@ -308,6 +322,7 @@ function IntegrationCard({
 }
 
 export default function AdminIntegrationsPage() {
+  const gt = useGT();
   const [searchQuery, setSearchQuery] = useState('');
 
   const {
@@ -340,11 +355,15 @@ export default function AdminIntegrationsPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h2 className="text-2xl font-bold">Integration Credentials</h2>
-        <p className="text-muted-foreground mt-1">
-          Configure platform-wide OAuth credentials for integrations. These credentials will be used
-          as the default for all organizations.
-        </p>
+        <T>
+          <h2 className="text-2xl font-bold">Integration Credentials</h2>
+        </T>
+        <T>
+          <p className="text-muted-foreground mt-1">
+            Configure platform-wide OAuth credentials for integrations. These credentials will be used
+            as the default for all organizations.
+          </p>
+        </T>
       </div>
 
       {/* Stats */}
@@ -352,19 +371,25 @@ export default function AdminIntegrationsPage() {
         <Card>
           <CardContent className="pt-6">
             <div className="text-2xl font-bold">{integrations?.length || 0}</div>
-            <div className="text-sm text-muted-foreground">Total Integrations</div>
+            <T>
+              <div className="text-sm text-muted-foreground">Total Integrations</div>
+            </T>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="pt-6">
             <div className="text-2xl font-bold text-green-600">{configuredCount}</div>
-            <div className="text-sm text-muted-foreground">Configured</div>
+            <T>
+              <div className="text-sm text-muted-foreground">Configured</div>
+            </T>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="pt-6">
             <div className="text-2xl font-bold text-yellow-600">{totalOAuth - configuredCount}</div>
-            <div className="text-sm text-muted-foreground">OAuth Pending Setup</div>
+            <T>
+              <div className="text-sm text-muted-foreground">OAuth Pending Setup</div>
+            </T>
           </CardContent>
         </Card>
       </div>
@@ -374,7 +399,7 @@ export default function AdminIntegrationsPage() {
         <div className="relative flex-1 max-w-sm">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Search integrations..."
+            placeholder={gt('Search integrations...')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-9"
@@ -382,13 +407,13 @@ export default function AdminIntegrationsPage() {
         </div>
         <Button variant="outline" onClick={() => mutate()} disabled={isLoading}>
           <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
-          Refresh
+          {gt('Refresh')}
         </Button>
       </div>
 
       {error && (
         <div className="p-4 bg-red-500/10 text-red-500 rounded-lg">
-          Failed to load integrations: {error.message}
+          {gt('Failed to load integrations: {message}', { message: error.message })}
         </div>
       )}
 
@@ -404,7 +429,7 @@ export default function AdminIntegrationsPage() {
           {oauthIntegrations.length > 0 && (
             <div>
               <h3 className="text-lg font-semibold mb-4">
-                OAuth Integrations ({oauthIntegrations.length})
+                {gt('OAuth Integrations ({count})', { count: oauthIntegrations.length })}
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {oauthIntegrations.map((integration) => (
@@ -422,7 +447,7 @@ export default function AdminIntegrationsPage() {
           {otherIntegrations.length > 0 && (
             <div>
               <h3 className="text-lg font-semibold mb-4">
-                Other Integrations ({otherIntegrations.length})
+                {gt('Other Integrations ({count})', { count: otherIntegrations.length })}
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {otherIntegrations.map((integration) => (
