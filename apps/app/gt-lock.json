@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "entries": {
+    "brc_g42vnpm8fmo57h5depfoaves": {
+      "879f3a5f954ee8b75bf1e91f4ea9916b41c933e5beba7eb6362647a637c9c66d": {
+        "bc89a9bd1b1a9f3d7be4f886ce5f3e089e358255f0ce3f7257d8cfa8681d23b4": {
+          "ja": {
+            "updatedAt": "2025-12-12T23:46:46.287Z",
+            "postProcessHash": "dbf09e2c059aa1e8cfa6686b2ad3ee80d23b7ab21d6e1a259c326dec32d8aabf"
+          },
+          "zh": {
+            "updatedAt": "2025-12-12T23:46:46.289Z",
+            "postProcessHash": "365262e0a6d673903efc158af51c9bfce3519b5de8c3dda711f7be2950a7dc6e"
+          }
+        }
+      }
+    }
+  }
+}
