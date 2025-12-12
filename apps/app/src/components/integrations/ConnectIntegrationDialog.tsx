@@ -19,6 +19,7 @@ import { Label } from '@comp/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@comp/ui/select';
 import { Textarea } from '@comp/ui/textarea';
 import { Eye, EyeOff, Loader2 } from 'lucide-react';
+import { useGT } from 'gt-next';
 import Image from 'next/image';
 import { useCallback, useState } from 'react';
 import { toast } from 'sonner';
@@ -41,6 +42,7 @@ function CredentialInput({
   value: string;
   onChange: (value: string) => void;
 }) {
+  const gt = useGT();
   const [showPassword, setShowPassword] = useState(false);
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
     onChange(e.target.value);
@@ -76,7 +78,7 @@ function CredentialInput({
     return (
       <Select value={value} onValueChange={onChange}>
         <SelectTrigger>
-          <SelectValue placeholder={field.placeholder || 'Select...'} />
+          <SelectValue placeholder={field.placeholder || gt('Select...')} />
         </SelectTrigger>
         <SelectContent>
           {field.options?.map((opt) => (
@@ -104,11 +106,11 @@ function CredentialInput({
         selectedItem={selectedItem}
         onSelect={(item) => onChange(item.id)}
         onCreate={(customValue) => onChange(customValue)}
-        placeholder={field.placeholder || 'Select or type...'}
-        searchPlaceholder="Search or type custom value..."
+        placeholder={field.placeholder || gt('Select or type...')}
+        searchPlaceholder={gt('Search or type custom value...')}
         renderOnCreate={(customValue) => (
           <div className="flex items-center gap-2">
-            <span className="text-sm">Use custom value:</span>
+            <span className="text-sm">{gt('Use custom value:')}</span>
             <span className="font-medium">{customValue}</span>
           </div>
         )}
@@ -117,7 +119,7 @@ function CredentialInput({
   }
 
   const inputType = field.type === 'url' ? 'url' : field.type === 'number' ? 'number' : 'text';
-  const placeholder = field.type === 'url' ? field.placeholder || 'https://...' : field.placeholder;
+  const placeholder = field.type === 'url' ? field.placeholder || gt('https://...') : field.placeholder;
 
   return <Input type={inputType} value={value} onChange={handleChange} placeholder={placeholder} />;
 }
@@ -130,6 +132,7 @@ export function ConnectIntegrationDialog({
   integrationLogoUrl,
   onConnected,
 }: ConnectIntegrationDialogProps) {
+  const gt = useGT();
   const { startOAuth, createConnection, testConnection } = useIntegrationMutations();
   const { providers } = useIntegrationProviders(true);
   const [connecting, setConnecting] = useState(false);
@@ -145,17 +148,17 @@ export function ConnectIntegrationDialog({
       return [
         {
           id: 'username',
-          label: 'Username',
+          label: gt('Username'),
           type: 'text' as const,
           required: true,
-          placeholder: 'Enter username',
+          placeholder: gt('Enter username'),
         },
         {
           id: 'password',
-          label: 'Password',
+          label: gt('Password'),
           type: 'password' as const,
           required: true,
-          placeholder: 'Enter password',
+          placeholder: gt('Enter password'),
         },
       ];
     }
@@ -163,10 +166,10 @@ export function ConnectIntegrationDialog({
       return [
         {
           id: 'api_key',
-          label: 'API Key',
+          label: gt('API Key'),
           type: 'password' as const,
           required: true,
-          placeholder: 'Enter your API key',
+          placeholder: gt('Enter your API key'),
         },
       ];
     }
@@ -185,11 +188,11 @@ export function ConnectIntegrationDialog({
       if (result.authorizationUrl) {
         window.location.href = result.authorizationUrl;
       } else {
-        toast.error(result.error || 'Failed to start connection');
+        toast.error(result.error || gt('Failed to start connection'));
         setConnecting(false);
       }
     } catch {
-      toast.error('Failed to start connection');
+      toast.error(gt('Failed to start connection'));
       setConnecting(false);
     }
   }, [integrationId, startOAuth]);
@@ -199,7 +202,7 @@ export function ConnectIntegrationDialog({
     const newErrors: Record<string, string> = {};
     for (const field of allFields) {
       if (field.required && !credentials[field.id]?.trim()) {
-        newErrors[field.id] = `${field.label} is required`;
+        newErrors[field.id] = gt('{label} is required', { label: field.label });
       }
     }
 
@@ -215,7 +218,7 @@ export function ConnectIntegrationDialog({
       const result = await createConnection(integrationId, credentials);
 
       if (!result.success) {
-        toast.error(result.error || 'Failed to create connection');
+        toast.error(result.error || gt('Failed to create connection'));
         setConnecting(false);
         return;
       }
@@ -227,26 +230,26 @@ export function ConnectIntegrationDialog({
           if (!testResult.success) {
             // Check if it's just "not supported" vs actual failure
             if (testResult.message?.includes('does not support')) {
-              toast.success(`${integrationName} connected! Credentials saved.`);
+              toast.success(gt('{name} connected! Credentials saved.', { name: integrationName }));
             } else {
-              toast.warning(`${integrationName} connected but test failed: ${testResult.message}`);
+              toast.warning(gt('{name} connected but test failed: {message}', { name: integrationName, message: testResult.message }));
             }
           } else {
-            toast.success(`${integrationName} connected and verified!`);
+            toast.success(gt('{name} connected and verified!', { name: integrationName }));
           }
         } catch {
           // Test failed but connection was created
-          toast.success(`${integrationName} connected! Credentials saved.`);
+          toast.success(gt('{name} connected! Credentials saved.', { name: integrationName }));
         }
       } else {
-        toast.success(`${integrationName} connected!`);
+        toast.success(gt('{name} connected!', { name: integrationName }));
       }
 
       onConnected?.();
       onOpenChange(false);
       setCredentials({});
     } catch {
-      toast.error('Failed to create connection');
+      toast.error(gt('Failed to create connection'));
     } finally {
       setConnecting(false);
     }
@@ -279,17 +282,16 @@ export function ConnectIntegrationDialog({
         return (
           <div className="space-y-3">
             <p className="text-sm text-muted-foreground">
-              This integration uses OAuth to securely connect to your {integrationName} account.
-              You'll be asked to authorize access to the required permissions.
+              {gt("This integration uses OAuth to securely connect to your {name} account. You'll be asked to authorize access to the required permissions.", { name: integrationName })}
             </p>
             <Button onClick={handleOAuthConnect} disabled={connecting} className="w-full">
               {connecting ? (
                 <>
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Connecting...
+                  {gt('Connecting...')}
                 </>
               ) : (
-                <>Continue with {integrationName}</>
+                <>{gt('Continue with {name}', { name: integrationName })}</>
               )}
             </Button>
           </div>
@@ -320,10 +322,10 @@ export function ConnectIntegrationDialog({
               {connecting ? (
                 <>
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Connecting...
+                  {gt('Connecting...')}
                 </>
               ) : (
-                'Connect'
+                gt('Connect')
               )}
             </Button>
           </div>
@@ -333,8 +335,7 @@ export function ConnectIntegrationDialog({
         return (
           <div className="space-y-3">
             <p className="text-sm text-muted-foreground">
-              This integration requires a service account with JWT authentication. Please contact
-              your administrator to configure this integration.
+              {gt('This integration requires a service account with JWT authentication. Please contact your administrator to configure this integration.')}
             </p>
           </div>
         );
@@ -372,10 +373,10 @@ export function ConnectIntegrationDialog({
                 {connecting ? (
                   <>
                     <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    Connecting...
+                    {gt('Connecting...')}
                   </>
                 ) : (
-                  'Connect'
+                  gt('Connect')
                 )}
               </Button>
             </div>
@@ -385,13 +386,12 @@ export function ConnectIntegrationDialog({
         return (
           <div className="space-y-3">
             <p className="text-sm text-muted-foreground">
-              This integration requires custom configuration. Please refer to the documentation for
-              setup instructions.
+              {gt('This integration requires custom configuration. Please refer to the documentation for setup instructions.')}
             </p>
             {provider?.docsUrl && (
               <Button variant="outline" className="w-full" asChild>
                 <a href={provider.docsUrl} target="_blank" rel="noopener noreferrer">
-                  View Documentation
+                  {gt('View Documentation')}
                 </a>
               </Button>
             )}
@@ -401,23 +401,23 @@ export function ConnectIntegrationDialog({
       default:
         return (
           <p className="text-sm text-muted-foreground">
-            Unable to determine authentication method for this integration.
+            {gt('Unable to determine authentication method for this integration.')}
           </p>
         );
     }
   };
 
   const descriptions: Record<string, string> = {
-    oauth2: `You'll be redirected to ${integrationName} to authorize the connection.`,
-    api_key: `Enter your ${integrationName} API key to connect.`,
-    basic: `Enter your ${integrationName} credentials to connect.`,
-    jwt: 'This integration requires service account authentication.',
+    oauth2: gt("You'll be redirected to {name} to authorize the connection.", { name: integrationName }),
+    api_key: gt('Enter your {name} API key to connect.', { name: integrationName }),
+    basic: gt('Enter your {name} credentials to connect.', { name: integrationName }),
+    jwt: gt('This integration requires service account authentication.'),
     custom:
       allFields.length > 0
-        ? `Configure your ${integrationName} connection.`
-        : 'This integration requires custom configuration.',
+        ? gt('Configure your {name} connection.', { name: integrationName })
+        : gt('This integration requires custom configuration.'),
   };
-  const description = (authType && descriptions[authType]) || 'Configure your connection settings.';
+  const description = (authType && descriptions[authType]) || gt('Configure your connection settings.');
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -433,7 +433,7 @@ export function ConnectIntegrationDialog({
                 className="object-contain"
               />
             </div>
-            Connect {integrationName}
+            {gt('Connect {name}', { name: integrationName })}
           </DialogTitle>
           <DialogDescription>{description}</DialogDescription>
         </DialogHeader>

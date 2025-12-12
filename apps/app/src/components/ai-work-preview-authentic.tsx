@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { MiniDataStream } from './mini-data-stream';
+import { msg, useMessages } from 'gt-next';
 
 interface WorkItem {
   id: string;
@@ -28,40 +29,40 @@ interface WorkItem {
 const WORK_ITEMS: WorkItem[] = [
   {
     id: '1',
-    title: 'Analyzing your tech stack',
-    subtitle: 'AWS, GitHub, Stripe detected',
+    title: msg('Analyzing your tech stack'),
+    subtitle: msg('AWS, GitHub, Stripe detected'),
     type: 'evidence',
     status: 'waiting' as const,
     progress: 0,
   },
   {
     id: '2',
-    title: 'Researching vendor compliance',
-    subtitle: 'Checking SOC 2 & security certifications',
+    title: msg('Researching vendor compliance'),
+    subtitle: msg('Checking SOC 2 & security certifications'),
     type: 'vendor',
     status: 'waiting' as const,
     progress: 0,
   },
   {
     id: '3',
-    title: 'Drafting security policies',
-    subtitle: 'Based on your infrastructure',
+    title: msg('Drafting security policies'),
+    subtitle: msg('Based on your infrastructure'),
     type: 'policy',
     status: 'waiting' as const,
     progress: 0,
   },
   {
     id: '4',
-    title: 'Identifying compliance risks',
-    subtitle: 'Scanning for gaps and vulnerabilities',
+    title: msg('Identifying compliance risks'),
+    subtitle: msg('Scanning for gaps and vulnerabilities'),
     type: 'risk',
     status: 'waiting' as const,
     progress: 0,
   },
   {
     id: '5',
-    title: 'Setting up monitoring',
-    subtitle: 'Continuous compliance tracking',
+    title: msg('Setting up monitoring'),
+    subtitle: msg('Continuous compliance tracking'),
     type: 'control',
     status: 'waiting' as const,
     progress: 0,
@@ -104,6 +105,7 @@ const getIcon = (type: WorkItem['type']) => {
 };
 
 export function AiWorkPreviewAuthentic() {
+  const m = useMessages();
   const [workItems, setWorkItems] = useState<WorkItem[]>(WORK_ITEMS);
   const [overallProgress, setOverallProgress] = useState(0);
 
@@ -186,12 +188,12 @@ export function AiWorkPreviewAuthentic() {
           )}
         </div>
         <div className="flex-1">
-          <h2 className="text-2xl font-semibold">AI is building your compliance program</h2>
+          <h2 className="text-2xl font-semibold">{m(msg('AI is building your compliance program'))}</h2>
           <p className="text-sm text-muted-foreground mt-1">
-            This process typically takes 2-7 minutes to complete
+            {m(msg('This process typically takes 2-7 minutes to complete'))}
           </p>
           <p className="text-xs text-muted-foreground/70 mt-1">
-            We're thoroughly analyzing your infrastructure to create accurate, personalized policies
+            {m(msg('We\'re thoroughly analyzing your infrastructure to create accurate, personalized policies'))}
           </p>
         </div>
       </div>
@@ -199,25 +201,28 @@ export function AiWorkPreviewAuthentic() {
       {/* Overall Progress */}
       <div className="space-y-2">
         <div className="flex justify-between items-center">
-          <span className="text-sm text-muted-foreground">Background job progress</span>
+          <span className="text-sm text-muted-foreground">{m(msg('Background job progress'))}</span>
           <span className="text-lg font-semibold tabular-nums">{overallProgress}%</span>
         </div>
         <Progress value={overallProgress} className="h-2" />
         <p className="text-xs text-muted-foreground/70">
-          {completedCount} of {workItems.length} tasks completed • Estimated time remaining:{' '}
-          {overallProgress < 10
-            ? '6-7 min'
-            : overallProgress < 20
-              ? '5-6 min'
-              : overallProgress < 40
-                ? '4-5 min'
-                : overallProgress < 60
-                  ? '3-4 min'
-                  : overallProgress < 80
-                    ? '2-3 min'
-                    : overallProgress < 90
-                      ? '1-2 min'
-                      : 'Almost done...'}
+          {m(msg('{completedCount} of {totalCount} tasks completed • Estimated time remaining: {timeRemaining}', {
+            completedCount,
+            totalCount: workItems.length,
+            timeRemaining: overallProgress < 10
+              ? '6-7 min'
+              : overallProgress < 20
+                ? '5-6 min'
+                : overallProgress < 40
+                  ? '4-5 min'
+                  : overallProgress < 60
+                    ? '3-4 min'
+                    : overallProgress < 80
+                      ? '2-3 min'
+                      : overallProgress < 90
+                        ? '1-2 min'
+                        : 'Almost done...'
+          }))}
         </p>
       </div>
 
@@ -259,11 +264,11 @@ export function AiWorkPreviewAuthentic() {
                               isComplete && 'text-muted-foreground',
                             )}
                           >
-                            {item.title}
+                            {m(item.title)}
                           </p>
                         </div>
                         {item.subtitle && !isProcessing && (
-                          <p className="text-xs text-muted-foreground/60 pl-5">{item.subtitle}</p>
+                          <p className="text-xs text-muted-foreground/60 pl-5">{m(item.subtitle)}</p>
                         )}
                       </div>
 
@@ -288,8 +293,10 @@ export function AiWorkPreviewAuthentic() {
                               isStuck && 'text-amber-600 dark:text-amber-400',
                             )}
                           >
-                            {Math.round(item.progress)}% complete
-                            {isStuck && ' - Finalizing...'}
+                            {m(msg('{progress}% complete{finalizing}', {
+                              progress: Math.round(item.progress),
+                              finalizing: isStuck ? ' - Finalizing...' : ''
+                            }))}
                           </p>
                         </div>
                       </div>

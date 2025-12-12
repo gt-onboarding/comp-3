@@ -8,6 +8,7 @@ import { Button } from '@comp/ui/button';
 import { cn } from '@comp/ui/cn';
 import { Input } from '@comp/ui/input';
 import { useQueryState } from 'nuqs';
+import { useGT, useMessages } from 'gt-next';
 import { DataTableDateFilter } from './data-table-date-filter';
 import { DataTableFacetedFilter } from './data-table-faceted-filter';
 import { DataTableSliderFilter } from './data-table-slider-filter';
@@ -26,6 +27,8 @@ export function DataTableToolbar<TData>({
   className,
   ...props
 }: DataTableToolbarProps<TData>) {
+  const gt = useGT();
+  const m = useMessages();
   const isFiltered = table.getState().columnFilters.length > 0;
   const [open, setOpen] = useQueryState(sheet ?? '');
   const isOpen = Boolean(open);
@@ -53,7 +56,7 @@ export function DataTableToolbar<TData>({
         {isFiltered && (
           <Button variant="outline" size="sm" onClick={onReset}>
             <X className="h-4 w-4" />
-            <span className="ml-2 hidden md:inline">Reset</span>
+            <span className="ml-2 hidden md:inline">{gt('Reset')}</span>
           </Button>
         )}
       </div>
@@ -62,7 +65,7 @@ export function DataTableToolbar<TData>({
         {sheet && (
           <Button variant="default" size="sm" onClick={() => setOpen('true')}>
             <Plus className="h-4 w-4" />
-            <span>{action}</span>
+            <span>{action ? m(action) : null}</span>
           </Button>
         )}
       </div>
@@ -75,6 +78,8 @@ interface DataTableToolbarFilterProps<TData> {
 }
 
 function DataTableToolbarFilter<TData>({ column }: DataTableToolbarFilterProps<TData>) {
+  const gt = useGT();
+  const m = useMessages();
   const columnMeta = column.columnDef.meta;
 
   const onFilterRender = React.useCallback(() => {
@@ -86,7 +91,7 @@ function DataTableToolbarFilter<TData>({ column }: DataTableToolbarFilterProps<T
           <div className="relative w-full max-w-xs">
             <Input
               leftIcon={<Search className="h-4 w-4" />}
-              placeholder={columnMeta.placeholder ?? columnMeta.label}
+              placeholder={m(columnMeta.placeholder ?? columnMeta.label)}
               value={(column.getFilterValue() as string) ?? ''}
               onChange={(event) => {
                 column.setFilterValue(event.target.value);
@@ -102,28 +107,28 @@ function DataTableToolbarFilter<TData>({ column }: DataTableToolbarFilterProps<T
             <Input
               type="number"
               inputMode="numeric"
-              placeholder={columnMeta.placeholder ?? columnMeta.label}
+              placeholder={m(columnMeta.placeholder ?? columnMeta.label)}
               value={(column.getFilterValue() as string) ?? ''}
               onChange={(event) => column.setFilterValue(event.target.value)}
               className={cn('w-32', columnMeta.unit && 'pr-8')}
             />
             {columnMeta.unit && (
               <span className="bg-muted text-muted-foreground absolute inset-y-0 right-0 flex items-center rounded-r-md px-2 text-sm">
-                {columnMeta.unit}
+                {m(columnMeta.unit)}
               </span>
             )}
           </div>
         );
 
       case 'range':
-        return <DataTableSliderFilter column={column} title={columnMeta.label ?? column.id} />;
+        return <DataTableSliderFilter column={column} title={m(columnMeta.label ?? column.id)} />;
 
       case 'date':
       case 'dateRange':
         return (
           <DataTableDateFilter
             column={column}
-            title={columnMeta.label ?? column.id}
+            title={m(columnMeta.label ?? column.id)}
             multiple={columnMeta.variant === 'dateRange'}
           />
         );
@@ -133,7 +138,7 @@ function DataTableToolbarFilter<TData>({ column }: DataTableToolbarFilterProps<T
         return (
           <DataTableFacetedFilter
             column={column}
-            title={columnMeta.label ?? column.id}
+            title={m(columnMeta.label ?? column.id)}
             options={columnMeta.options ?? []}
             multiple={columnMeta.variant === 'multiSelect'}
           />
@@ -142,7 +147,7 @@ function DataTableToolbarFilter<TData>({ column }: DataTableToolbarFilterProps<T
       default:
         return null;
     }
-  }, [column, columnMeta]);
+  }, [column, columnMeta, gt, m]);
 
   return onFilterRender();
 }

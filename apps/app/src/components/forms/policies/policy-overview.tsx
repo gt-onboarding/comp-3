@@ -13,6 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Departments, Frequency, type Policy, type PolicyStatus } from '@db';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { format } from 'date-fns';
+import { T, Var, useGT } from 'gt-next';
 import { CalendarIcon, Loader2 } from 'lucide-react';
 import { useAction } from 'next-safe-action/hooks';
 import { useForm } from 'react-hook-form';
@@ -22,14 +23,15 @@ import type { z } from 'zod';
 const policyStatuses: PolicyStatus[] = ['draft', 'published', 'needs_review'] as const;
 
 export function UpdatePolicyOverview({ policy }: { policy: Policy }) {
+  const gt = useGT();
   const session = useSession();
 
   const updatePolicyForm = useAction(updatePolicyFormAction, {
     onSuccess: () => {
-      toast.success('Policy updated successfully');
+      toast.success(gt('Policy updated successfully'));
     },
     onError: () => {
-      toast.error('Failed to update policy');
+      toast.error(gt('Failed to update policy'));
     },
   });
 
@@ -75,11 +77,13 @@ export function UpdatePolicyOverview({ policy }: { policy: Policy }) {
             name="status"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{'Status'}</FormLabel>
+                <FormLabel>
+                  <T>Status</T>
+                </FormLabel>
                 <FormControl>
                   <Select value={field.value} onValueChange={field.onChange}>
                     <SelectTrigger>
-                      <SelectValue placeholder={'Select a status'}>
+                      <SelectValue placeholder={gt('Select a status')}>
                         {field.value && <StatusIndicator status={field.value} />}
                       </SelectValue>
                     </SelectTrigger>
@@ -101,11 +105,13 @@ export function UpdatePolicyOverview({ policy }: { policy: Policy }) {
             name="review_frequency"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{'Review Frequency'}</FormLabel>
+                <FormLabel>
+                  <T>Review Frequency</T>
+                </FormLabel>
                 <FormControl>
                   <Select value={field.value} onValueChange={field.onChange}>
                     <SelectTrigger>
-                      <SelectValue placeholder={'Select a frequency'} />
+                      <SelectValue placeholder={gt('Select a frequency')} />
                     </SelectTrigger>
                     <SelectContent>
                       {Object.values(Frequency).map((frequency) => {
@@ -113,7 +119,9 @@ export function UpdatePolicyOverview({ policy }: { policy: Policy }) {
                           frequency.charAt(0).toUpperCase() + frequency.slice(1);
                         return (
                           <SelectItem key={frequency} value={frequency}>
-                            {formattedFrequency}
+                            <T>
+                              <Var>{formattedFrequency}</Var>
+                            </T>
                           </SelectItem>
                         );
                       })}
@@ -129,11 +137,13 @@ export function UpdatePolicyOverview({ policy }: { policy: Policy }) {
             name="department"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{'Department'}</FormLabel>
+                <FormLabel>
+                  <T>Department</T>
+                </FormLabel>
                 <FormControl>
                   <Select {...field} value={field.value} onValueChange={field.onChange}>
                     <SelectTrigger>
-                      <SelectValue placeholder={'Select a department'} />
+                      <SelectValue placeholder={gt('Select a department')} />
                     </SelectTrigger>
                     <SelectContent>
                       {Object.values(Departments).map((department) => {
@@ -141,7 +151,9 @@ export function UpdatePolicyOverview({ policy }: { policy: Policy }) {
 
                         return (
                           <SelectItem key={department} value={department}>
-                            {formattedDepartment}
+                            <T>
+                              <Var>{formattedDepartment}</Var>
+                            </T>
                           </SelectItem>
                         );
                       })}
@@ -159,7 +171,9 @@ export function UpdatePolicyOverview({ policy }: { policy: Policy }) {
             name="review_date"
             render={({ field }) => (
               <FormItem className="flex flex-col">
-                <FormLabel>{'Review Date'}</FormLabel>
+                <FormLabel>
+                  <T>Review Date</T>
+                </FormLabel>
                 <Popover>
                   <PopoverTrigger asChild>
                     <FormControl>
@@ -171,7 +185,13 @@ export function UpdatePolicyOverview({ policy }: { policy: Policy }) {
                             !field.value && 'text-muted-foreground',
                           )}
                         >
-                          {field.value ? format(field.value, 'PPP') : <span>{'Pick a date'}</span>}
+                          {field.value ? (
+                            format(field.value, 'PPP')
+                          ) : (
+                            <T>
+                              <span>Pick a date</span>
+                            </T>
+                          )}
                           <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                         </Button>
                       </div>
@@ -201,7 +221,7 @@ export function UpdatePolicyOverview({ policy }: { policy: Policy }) {
             {updatePolicyForm.status === 'executing' ? (
               <Loader2 className="h-4 w-4 animate-spin" />
             ) : (
-              'Save'
+              <T>Save</T>
             )}
           </Button>
         </div>

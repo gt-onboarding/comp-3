@@ -9,6 +9,7 @@ import equal from 'fast-deep-equal';
 import { AnimatePresence, motion } from 'motion/react';
 import { ErrorBoundary } from 'next/dist/client/components/error-boundary';
 import { memo, useCallback, useEffect, useState } from 'react';
+import { T, useGT } from 'gt-next';
 import { ErrorFallback } from '../error-fallback';
 import { LogoSpinner } from '../logo-spinner';
 import { MemoizedReactMarkdown } from '../markdown';
@@ -33,6 +34,7 @@ interface ReasoningMessagePartProps {
 
 export function ReasoningMessagePart({ part, isReasoning }: ReasoningMessagePartProps) {
   const [isExpanded, setIsExpanded] = useState(false);
+  const gt = useGT();
 
   const variants = {
     collapsed: {
@@ -62,22 +64,22 @@ export function ReasoningMessagePart({ part, isReasoning }: ReasoningMessagePart
       {isReasoning ? (
         <div className="group relative flex items-start py-2">
           <div className="flex size-[25px] shrink-0 items-center justify-center select-none">
-            <ChatAvatar participantType="assistant" aria-label="Assistant" />
+            <ChatAvatar participantType="assistant" aria-label={gt('Assistant')} />
           </div>
           <div className="ml-4 flex-1 overflow-hidden pl-2 text-xs">
             <div className="font-medium flex items-center gap-2">
-              Reasoning <LogoSpinner size={16} />
+              <T>Reasoning</T> <LogoSpinner size={16} />
             </div>
           </div>
         </div>
       ) : (
         <div className="group relative flex items-start py-2">
           <div className="flex size-[25px] shrink-0 items-center justify-center select-none">
-            <ChatAvatar participantType="assistant" aria-label="Assistant" />
+            <ChatAvatar participantType="assistant" aria-label={gt('Assistant')} />
           </div>
           <div className="ml-4 flex-1 overflow-hidden pl-2 text-xs">
             <div className="flex items-center gap-2">
-              <div className="font-medium">Reasoned for a few seconds</div>
+              <T><div className="font-medium">Reasoned for a few seconds</div></T>
             </div>
           </div>
         </div>

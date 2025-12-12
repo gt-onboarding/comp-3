@@ -9,6 +9,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@comp/ui/select';
 import { Departments, Member, type Risk, RiskCategory, RiskStatus, type User } from '@db';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useGT } from 'gt-next';
 import { Loader2 } from 'lucide-react';
 import { useAction } from 'next-safe-action/hooks';
 
@@ -23,12 +24,13 @@ export function UpdateRiskOverview({
   risk: Risk;
   assignees: (Member & { user: User })[];
 }) {
+  const gt = useGT();
   const updateRisk = useAction(updateRiskAction, {
     onSuccess: () => {
-      toast.success('Risk updated successfully');
+      toast.success(gt('Risk updated successfully'));
     },
     onError: () => {
-      toast.error('Failed to update risk');
+      toast.error(gt('Failed to update risk'));
     },
   });
 
@@ -66,7 +68,7 @@ export function UpdateRiskOverview({
             name="assigneeId"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{'Assignee'}</FormLabel>
+                <FormLabel>{gt('Assignee')}</FormLabel>
                 <FormControl>
                   <SelectAssignee
                     assigneeId={field.value ?? null}
@@ -85,11 +87,11 @@ export function UpdateRiskOverview({
             name="status"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{'Status'}</FormLabel>
+                <FormLabel>{gt('Status')}</FormLabel>
                 <FormControl>
                   <Select value={field.value} onValueChange={field.onChange}>
                     <SelectTrigger>
-                      <SelectValue placeholder={'Select a status'}>
+                      <SelectValue placeholder={gt('Select a status')}>
                         {field.value && <StatusIndicator status={field.value as RiskStatus} />}
                       </SelectValue>
                     </SelectTrigger>
@@ -111,11 +113,11 @@ export function UpdateRiskOverview({
             name="category"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{'Category'}</FormLabel>
+                <FormLabel>{gt('Category')}</FormLabel>
                 <FormControl>
                   <Select {...field} value={field.value} onValueChange={field.onChange}>
                     <SelectTrigger>
-                      <SelectValue placeholder={'Select a category'} />
+                      <SelectValue placeholder={gt('Select a category')} />
                     </SelectTrigger>
                     <SelectContent>
                       {Object.values(RiskCategory).map((category) => {
@@ -142,11 +144,11 @@ export function UpdateRiskOverview({
             name="department"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{'Department'}</FormLabel>
+                <FormLabel>{gt('Department')}</FormLabel>
                 <FormControl>
                   <Select {...field} value={field.value} onValueChange={field.onChange}>
                     <SelectTrigger>
-                      <SelectValue placeholder={'Select a department'} />
+                      <SelectValue placeholder={gt('Select a department')} />
                     </SelectTrigger>
                     <SelectContent>
                       {Object.values(Departments).map((department) => {
@@ -171,7 +173,7 @@ export function UpdateRiskOverview({
             {updateRisk.status === 'executing' ? (
               <Loader2 className="h-4 w-4 animate-spin" />
             ) : (
-              'Save'
+              gt('Save')
             )}
           </Button>
         </div>

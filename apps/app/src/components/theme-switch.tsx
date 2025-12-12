@@ -11,6 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@comp/ui/select';
+import { useGT } from 'gt-next';
 
 type Theme = 'dark' | 'system' | 'light';
 
@@ -31,18 +32,25 @@ const ThemeIcon = ({ currentTheme }: Props) => {
 
 export const ThemeSwitch = () => {
   const { theme, setTheme, themes } = useTheme();
+  const gt = useGT();
+
+  const themeLabels: Record<string, string> = {
+    dark: gt('Dark'),
+    light: gt('Light'),
+    system: gt('System'),
+  };
 
   return (
     <div className="relative flex items-center">
       <Select defaultValue={theme} onValueChange={(value: Theme) => setTheme(value)}>
         <SelectTrigger className="h-[32px] w-full bg-transparent py-1.5 pr-3 pl-6 text-xs capitalize outline-hidden">
-          <SelectValue placeholder={'Theme'} />
+          <SelectValue placeholder={gt('Theme')} />
         </SelectTrigger>
         <SelectContent>
           <SelectGroup>
             {themes.map((theme) => (
               <SelectItem key={theme} value={theme} className="capitalize">
-                {theme.charAt(0).toUpperCase() + theme.slice(1)}
+                {themeLabels[theme] || theme}
               </SelectItem>
             ))}
           </SelectGroup>

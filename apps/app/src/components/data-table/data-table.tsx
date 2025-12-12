@@ -1,4 +1,5 @@
 import { type Table as TanstackTable, flexRender } from '@tanstack/react-table';
+import { T } from 'gt-next';
 import { useRouter } from 'next/navigation';
 import type * as React from 'react';
 
@@ -123,7 +124,7 @@ export function DataTable<TData>({
                   colSpan={table.getAllColumns().length}
                   className="text-muted-foreground h-24 text-center"
                 >
-                  No results.
+                  <T>No results.</T>
                 </TableCell>
               </TableRow>
             )}

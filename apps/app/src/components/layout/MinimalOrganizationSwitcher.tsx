@@ -13,6 +13,7 @@ import type { Organization } from '@db';
 import { Check, ChevronsUpDown, Loader2, Plus } from 'lucide-react';
 import { useAction } from 'next-safe-action/hooks';
 import { useRouter } from 'next/navigation';
+import { useGT } from 'gt-next';
 
 interface MinimalOrganizationSwitcherProps {
   organizations: Organization[];
@@ -24,6 +25,7 @@ export function MinimalOrganizationSwitcher({
   currentOrganization,
 }: MinimalOrganizationSwitcherProps) {
   const router = useRouter();
+  const gt = useGT();
   const { execute, status } = useAction(changeOrganizationAction, {
     onSuccess: (result) => {
       const orgId = result.data?.data?.id;
@@ -48,7 +50,7 @@ export function MinimalOrganizationSwitcher({
           className="h-auto p-1 text-sm font-medium"
           disabled={status === 'executing'}
         >
-          {currentOrganization?.name || 'Select Organization'}
+          {currentOrganization?.name || gt('Select Organization')}
           {status === 'executing' ? (
             <Loader2 className="ml-2 h-4 w-4 animate-spin" />
           ) : (
@@ -69,7 +71,7 @@ export function MinimalOrganizationSwitcher({
         <DropdownMenuItem onClick={() => router.push('/setup?intent=create-additional')}>
           <div className="flex items-center">
             <Plus className="mr-2 h-4 w-4" />
-            Create Organization
+            {gt('Create Organization')}
           </div>
         </DropdownMenuItem>
       </DropdownMenuContent>

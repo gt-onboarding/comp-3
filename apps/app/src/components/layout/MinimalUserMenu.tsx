@@ -14,6 +14,7 @@ import type { User } from 'better-auth';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { ThemeSwitch } from '../theme-switch';
+import { useGT } from 'gt-next';
 
 interface MinimalUserMenuProps {
   user: User;
@@ -21,6 +22,7 @@ interface MinimalUserMenuProps {
 
 export function MinimalUserMenu({ user }: MinimalUserMenuProps) {
   const router = useRouter();
+  const gt = useGT();
   const [isSigningOut, setIsSigningOut] = useState(false);
 
   const handleSignOut = async () => {
@@ -65,12 +67,12 @@ export function MinimalUserMenu({ user }: MinimalUserMenuProps) {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <div className="flex flex-row items-center justify-between p-2">
-          <p className="text-sm">Theme</p>
+          <p className="text-sm">{gt('Theme')}</p>
           <ThemeSwitch />
         </div>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={handleSignOut} disabled={isSigningOut}>
-          {isSigningOut ? 'Signing out...' : 'Sign out'}
+          {isSigningOut ? gt('Signing out...') : gt('Sign out')}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

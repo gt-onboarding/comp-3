@@ -1,6 +1,8 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@comp/ui/card';
 import { db, PolicyStatus } from '@db';
 import type { CSSProperties } from 'react';
+import { T, Var } from 'gt-next';
+import { getGT } from 'gt-next/server';
 
 interface Props {
   organizationId: string;
@@ -28,6 +30,7 @@ const policyStatus = {
 } as const;
 
 export async function PoliciesByAssignee({ organizationId }: Props) {
+  const gt = await getGT();
   const [userStats, policies] = await Promise.all([
     userData(organizationId),
     policiesByUser(organizationId),
@@ -59,45 +62,55 @@ export async function PoliciesByAssignee({ organizationId }: Props) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>{'Policies by Assignee'}</CardTitle>
+        <T>
+          <CardTitle>Policies by Assignee</CardTitle>
+        </T>
       </CardHeader>
       <CardContent>
         <div className="space-y-8">
           {stats.map((stat) => (
             <div key={stat.user.id} className="space-y-2">
               <div className="flex items-center justify-between">
-                <p className="text-sm">{stat.user.name || stat.user.email || 'Unknown User'}</p>
+                <p className="text-sm">{stat.user.name || stat.user.email || gt('Unknown User')}</p>
                 <span className="text-muted-foreground text-sm">
-                  {stat.totalPolicies} {'policies'}
+                  {stat.totalPolicies} {gt('policies')}
                 </span>
               </div>
 
-              <RiskBarChart stat={stat} />
+              <RiskBarChart stat={stat} gt={gt} />
 
               <div className="text-muted-foreground flex flex-wrap gap-3 text-xs">
                 <div className="flex items-center gap-1">
                   <div className="bg-primary size-2" />
-                  <span>
-                    {'Published'} ({stat.publishedPolicies})
-                  </span>
+                  <T>
+                    <span>
+                      Published (<Var>{stat.publishedPolicies}</Var>)
+                    </span>
+                  </T>
                 </div>
                 <div className="flex items-center gap-1">
                   <div className="size-2 bg-[var(--chart-open)]" />
-                  <span>
-                    {'Draft'} ({stat.draftPolicies})
-                  </span>
+                  <T>
+                    <span>
+                      Draft (<Var>{stat.draftPolicies}</Var>)
+                    </span>
+                  </T>
                 </div>
                 <div className="flex items-center gap-1">
                   <div className="size-2 bg-[var(--chart-pending)]" />
-                  <span>
-                    {'Archived'} ({stat.archivedPolicies})
-                  </span>
+                  <T>
+                    <span>
+                      Archived (<Var>{stat.archivedPolicies}</Var>)
+                    </span>
+                  </T>
                 </div>
                 <div className="flex items-center gap-1">
                   <div className="size-2 bg-[hsl(var(--destructive))]" />
-                  <span>
-                    {'Needs Review'} ({stat.needsReviewPolicies})
-                  </span>
+                  <T>
+                    <span>
+                      Needs Review (<Var>{stat.needsReviewPolicies}</Var>)
+                    </span>
+                  </T>
                 </div>
               </div>
             </div>
@@ -108,7 +121,7 @@ export async function PoliciesByAssignee({ organizationId }: Props) {
   );
 }
 
-function RiskBarChart({ stat }: { stat: UserPolicyStats }) {
+function RiskBarChart({ stat, gt }: { stat: UserPolicyStats; gt: Awaited<ReturnType<typeof getGT>> }) {
   const data = [
     ...(stat.publishedPolicies && stat.publishedPolicies > 0
       ? [
@@ -116,7 +129,7 @@ function RiskBarChart({ stat }: { stat: UserPolicyStats }) {
             key: 'published',
             value: stat.publishedPolicies,
             color: policyStatus.published,
-            label: 'Published',
+            label: gt('Published'),
           },
         ]
       : []),
@@ -126,7 +139,7 @@ function RiskBarChart({ stat }: { stat: UserPolicyStats }) {
             key: 'draft',
             value: stat.draftPolicies,
             color: policyStatus.draft,
-            label: 'Draft',
+            label: gt('Draft'),
           },
         ]
       : []),
@@ -136,7 +149,7 @@ function RiskBarChart({ stat }: { stat: UserPolicyStats }) {
             key: 'archived',
             value: stat.archivedPolicies,
             color: policyStatus.archived,
-            label: 'Archived',
+            label: gt('Archived'),
           },
         ]
       : []),
@@ -190,7 +203,7 @@ function RiskBarChart({ stat }: { stat: UserPolicyStats }) {
                   height: '100%',
                   borderRadius: `${cornerRadius}px`,
                 }}
-                title={`${d.label}: ${d.value}`}
+                title={gt('{label}: {value}', { label: d.label, value: d.value })}
               />
             </div>
           );

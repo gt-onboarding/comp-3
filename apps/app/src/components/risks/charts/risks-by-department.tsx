@@ -1,6 +1,7 @@
 import { auth } from '@/utils/auth';
 import { Card, CardContent, CardHeader, CardTitle } from '@comp/ui/card';
 import { db } from '@db';
+import { getGT } from 'gt-next/server';
 import { headers } from 'next/headers';
 import { cache } from 'react';
 import { DepartmentChart } from './department-chart';
@@ -8,6 +9,7 @@ import { DepartmentChart } from './department-chart';
 const ALL_DEPARTMENTS = ['none', 'admin', 'gov', 'hr', 'it', 'itsm', 'qms'];
 
 export async function RisksByDepartment() {
+  const gt = await getGT();
   const risks = await getRisksByDepartment();
 
   const data = ALL_DEPARTMENTS.map((dept) => {
@@ -16,7 +18,7 @@ export async function RisksByDepartment() {
     );
 
     return {
-      name: dept === 'none' ? 'None' : dept.toUpperCase(),
+      name: dept === 'none' ? gt('None') : dept.toUpperCase(),
       value: found ? found._count : 0,
     };
   }).sort((a, b) => b.value - a.value);
@@ -36,7 +38,7 @@ export async function RisksByDepartment() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>{'Risks by Department'}</CardTitle>
+        <CardTitle>{gt('Risks by Department')}</CardTitle>
       </CardHeader>
       <CardContent>
         <DepartmentChart data={departmentsToShow} showEmptyDepartments={true} />

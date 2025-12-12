@@ -23,6 +23,7 @@ import {
 } from '@tanstack/react-table';
 import { Filter, Search, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { useGT } from 'gt-next';
 import { DataTableHeader } from './DataTableHeader';
 import { DataTablePagination } from './DataTablePagination';
 import { DataTableSkeleton } from './DataTableSkeleton';
@@ -81,7 +82,7 @@ export function DataTable<TData>({
   columns,
   onRowClick,
   className,
-  emptyMessage = 'No data found.',
+  emptyMessage,
   isLoading = false,
   pagination,
   onPageChange,
@@ -90,8 +91,12 @@ export function DataTable<TData>({
   filters,
   ctaButton,
 }: DataTableProps<TData>) {
+  const gt = useGT();
   const [sorting, setSorting] = useState<SortingState>([]);
   const [searchValue, setSearchValue] = useState(search?.value || '');
+
+  // Use translated default if emptyMessage not provided
+  const displayEmptyMessage = emptyMessage || gt('No data found.');
 
   // Internal debounced search
   useEffect(() => {
@@ -133,7 +138,7 @@ export function DataTable<TData>({
               <div className="relative">
                 <Search className="text-muted-foreground absolute top-2.5 left-2 h-4 w-4" />
                 <Input
-                  placeholder={search.placeholder || 'Search...'}
+                  placeholder={search.placeholder || gt('Search...')}
                   value={searchValue}
                   onChange={(e) => setSearchValue(e.target.value)}
                   className="pr-8 pl-8"
@@ -160,7 +165,7 @@ export function DataTable<TData>({
                   className={cn('h-9 px-3', filters.hasActiveFilters && 'border-primary')}
                 >
                   <Filter className="mr-2 h-4 w-4" />
-                  Filters
+                  {gt('Filters')}
                   {filters.hasActiveFilters && filters.activeFilterCount && (
                     <Badge variant="secondary" className="ml-2 px-1 py-0">
                       {filters.activeFilterCount}
@@ -217,7 +222,7 @@ export function DataTable<TData>({
                       className="mt-2 w-full justify-start text-sm font-normal"
                       onClick={filters.onClearFilters}
                     >
-                      Clear all filters
+                      {gt('Clear all filters')}
                     </Button>
                   </div>
                 )}
@@ -279,7 +284,7 @@ export function DataTable<TData>({
               ) : (
                 <TableRow>
                   <TableCell colSpan={columns.length} className="h-24 text-center">
-                    {emptyMessage}
+                    {displayEmptyMessage}
                   </TableCell>
                 </TableRow>
               )}

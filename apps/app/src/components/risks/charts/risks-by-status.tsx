@@ -1,11 +1,13 @@
 import { auth } from '@/utils/auth';
 import { Card, CardContent, CardHeader, CardTitle } from '@comp/ui/card';
 import { db } from '@db';
+import { getGT } from 'gt-next/server';
 import { headers } from 'next/headers';
 import { cache } from 'react';
 import { StatusChart } from './status-chart';
 
 export async function RisksByStatus() {
+  const gt = await getGT();
   const risks = await getRisksByStatus();
 
   const data = risks.map((risk) => ({
@@ -16,7 +18,7 @@ export async function RisksByStatus() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>{'Risks by Status'}</CardTitle>
+        <CardTitle>{gt('Risks by Status')}</CardTitle>
       </CardHeader>
       <CardContent>
         <StatusChart data={data} />

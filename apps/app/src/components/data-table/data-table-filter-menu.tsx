@@ -1,6 +1,7 @@
 'use client';
 
 import type { Column, Table } from '@tanstack/react-table';
+import { T, Var, useGT } from 'gt-next';
 import { BadgeCheck, CalendarIcon, Check, ListFilter, Text, X } from 'lucide-react';
 import { useQueryState } from 'nuqs';
 import * as React from 'react';
@@ -48,6 +49,7 @@ export function DataTableFilterMenu<TData>({
   align = 'start',
   ...props
 }: DataTableFilterMenuProps<TData>) {
+  const gt = useGT();
   const id = React.useId();
 
   const columns = React.useMemo(() => {
@@ -212,7 +214,7 @@ export function DataTableFilterMenu<TData>({
       ))}
       {filters.length > 0 && (
         <Button
-          aria-label="Reset all filters"
+          aria-label={gt('Reset all filters')}
           variant="outline"
           size="icon"
           className="size-8"
@@ -224,7 +226,7 @@ export function DataTableFilterMenu<TData>({
       <Popover open={open} onOpenChange={onOpenChange}>
         <PopoverTrigger asChild>
           <Button
-            aria-label="Open filter command menu"
+            aria-label={gt('Open filter command menu')}
             variant="outline"
             size={filters.length > 0 ? 'icon' : 'sm'}
             className={cn(filters.length > 0 && 'size-8', 'h-8')}
@@ -232,7 +234,7 @@ export function DataTableFilterMenu<TData>({
             onKeyDown={onTriggerKeyDown}
           >
             <ListFilter />
-            {filters.length > 0 ? null : 'Filter'}
+            {filters.length > 0 ? null : <T>Filter</T>}
           </Button>
         </PopoverTrigger>
         <PopoverContent
@@ -246,7 +248,7 @@ export function DataTableFilterMenu<TData>({
               placeholder={
                 selectedColumn
                   ? (selectedColumn.columnDef.meta?.label ?? selectedColumn.id)
-                  : 'Search fields...'
+                  : gt('Search fields...')
               }
               value={inputValue}
               onValueChange={setInputValue}
@@ -256,7 +258,9 @@ export function DataTableFilterMenu<TData>({
               {selectedColumn ? (
                 <>
                   {selectedColumn.columnDef.meta?.options && (
-                    <CommandEmpty>No options found.</CommandEmpty>
+                    <CommandEmpty>
+                      <T>No options found.</T>
+                    </CommandEmpty>
                   )}
                   <FilterValueSelector
                     column={selectedColumn}
@@ -266,7 +270,9 @@ export function DataTableFilterMenu<TData>({
                 </>
               ) : (
                 <>
-                  <CommandEmpty>No fields found.</CommandEmpty>
+                  <CommandEmpty>
+                    <T>No fields found.</T>
+                  </CommandEmpty>
                   <CommandGroup>
                     {columns.map((column) => (
                       <CommandItem
@@ -315,6 +321,7 @@ function DataTableFilterItem<TData>({
   onFilterUpdate,
   onFilterRemove,
 }: DataTableFilterItemProps<TData>) {
+  const gt = useGT();
   const [showFieldSelector, setShowFieldSelector] = React.useState(false);
   const [showOperatorSelector, setShowOperatorSelector] = React.useState(false);
   const [showValueSelector, setShowValueSelector] = React.useState(false);
@@ -369,9 +376,11 @@ function DataTableFilterItem<TData>({
           className="w-48 origin-[var(--radix-popover-content-transform-origin)] p-0"
         >
           <Command loop>
-            <CommandInput placeholder="Search fields..." />
+            <CommandInput placeholder={gt('Search fields...')} />
             <CommandList>
-              <CommandEmpty>No fields found.</CommandEmpty>
+              <CommandEmpty>
+                <T>No fields found.</T>
+              </CommandEmpty>
               <CommandGroup>
                 {columns.map((column) => (
                   <CommandItem
@@ -440,6 +449,7 @@ function DataTableFilterItem<TData>({
         onFilterUpdate,
         showValueSelector,
         setShowValueSelector,
+        gt,
       })}
       <Button
         aria-controls={filterItemId}
@@ -468,10 +478,10 @@ function FilterValueSelector<TData>({ column, value, onSelect }: FilterValueSele
       return (
         <CommandGroup>
           <CommandItem value="true" onSelect={() => onSelect('true')}>
-            True
+            <T>True</T>
           </CommandItem>
           <CommandItem value="false" onSelect={() => onSelect('false')}>
-            False
+            <T>False</T>
           </CommandItem>
         </CommandGroup>
       );
@@ -514,12 +524,18 @@ function FilterValueSelector<TData>({ column, value, onSelect }: FilterValueSele
             {isEmpty ? (
               <>
                 <Text />
-                <span>Type to add filter...</span>
+                <span>
+                  <T>Type to add filter...</T>
+                </span>
               </>
             ) : (
               <>
                 <BadgeCheck />
-                <span className="truncate">Filter by &quot;{value}&quot;</span>
+                <span className="truncate">
+                  <T>
+                    Filter by &quot;<Var>{value}</Var>&quot;
+                  </T>
+                </span>
               </>
             )}
           </CommandItem>
@@ -536,6 +552,7 @@ function onFilterInputRender<TData>({
   onFilterUpdate,
   showValueSelector,
   setShowValueSelector,
+  gt,
 }: {
   filter: ExtendedColumnFilter<TData>;
   column: Column<TData>;
@@ -546,6 +563,7 @@ function onFilterInputRender<TData>({
   ) => void;
   showValueSelector: boolean;
   setShowValueSelector: (value: boolean) => void;
+  gt: (content: string) => string;
 }) {
   if (filter.operator === 'isEmpty' || filter.operator === 'isNotEmpty') {
     return (
@@ -587,7 +605,7 @@ function onFilterInputRender<TData>({
           id={inputId}
           type={isNumber ? 'number' : 'text'}
           inputMode={isNumber ? 'numeric' : undefined}
-          placeholder={column.columnDef.meta?.placeholder ?? 'Enter value...'}
+          placeholder={column.columnDef.meta?.placeholder ?? gt('Enter value...')}
           className="h-full w-24 rounded-sm px-1.5"
           defaultValue={typeof filter.value === 'string' ? filter.value : ''}
           onChange={(event) =>
@@ -617,8 +635,12 @@ function onFilterInputRender<TData>({
             <SelectValue placeholder={filter.value ? 'True' : 'False'} />
           </SelectTrigger>
           <SelectContent id={inputListboxId}>
-            <SelectItem value="true">True</SelectItem>
-            <SelectItem value="false">False</SelectItem>
+            <SelectItem value="true">
+              <T>True</T>
+            </SelectItem>
+            <SelectItem value="false">
+              <T>False</T>
+            </SelectItem>
           </SelectContent>
         </Select>
       );
@@ -645,9 +667,9 @@ function onFilterInputRender<TData>({
             >
               {selectedOptions.length === 0 ? (
                 filter.variant === 'multiSelect' ? (
-                  'Select options...'
+                  gt('Select options...')
                 ) : (
-                  'Select option...'
+                  gt('Select option...')
                 )
               ) : (
                 <>
@@ -665,7 +687,7 @@ function onFilterInputRender<TData>({
                   </div>
                   <span className="truncate">
                     {selectedOptions.length > 1
-                      ? `${selectedOptions.length} selected`
+                      ? gt('{count} selected', { count: selectedOptions.length })
                       : selectedOptions[0]?.label}
                   </span>
                 </>
@@ -678,9 +700,11 @@ function onFilterInputRender<TData>({
             className="w-48 origin-[var(--radix-popover-content-transform-origin)] p-0"
           >
             <Command>
-              <CommandInput placeholder="Search options..." />
+              <CommandInput placeholder={gt('Search options...')} />
               <CommandList>
-                <CommandEmpty>No options found.</CommandEmpty>
+                <CommandEmpty>
+                  <T>No options found.</T>
+                </CommandEmpty>
                 <CommandGroup>
                   {options.map((option) => (
                     <CommandItem
@@ -731,7 +755,7 @@ function onFilterInputRender<TData>({
             )}`
           : dateValue[0]
             ? formatDate(new Date(Number(dateValue[0])))
-            : 'Pick date...';
+            : gt('Pick date...');
 
       return (
         <Popover open={showValueSelector} onOpenChange={setShowValueSelector}>

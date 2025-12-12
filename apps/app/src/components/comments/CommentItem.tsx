@@ -25,6 +25,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@comp/ui/tooltip';
+import { useGT } from 'gt-next';
 import {
   AlertTriangle,
   FileIcon,
@@ -85,6 +86,7 @@ interface CommentItemProps {
 }
 
 export function CommentItem({ comment, refreshComments }: CommentItemProps) {
+  const gt = useGT();
   const [isEditing, setIsEditing] = useState(false);
   const [editedContent, setEditedContent] = useState(comment.content);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
@@ -109,7 +111,7 @@ export function CommentItem({ comment, refreshComments }: CommentItemProps) {
     const contentChanged = editedContent !== comment.content;
 
     if (!contentChanged) {
-      toast.info('No changes detected.');
+      toast.info(gt('No changes detected.'));
       setIsEditing(false);
       return;
     }
@@ -118,11 +120,11 @@ export function CommentItem({ comment, refreshComments }: CommentItemProps) {
       // Use API hook directly instead of server action
       await updateComment(comment.id, { content: editedContent });
 
-      toast.success('Comment updated successfully.');
+      toast.success(gt('Comment updated successfully.'));
       refreshComments();
       setIsEditing(false);
     } catch (error) {
-      toast.error('Failed to save comment changes.');
+      toast.error(gt('Failed to save comment changes.'));
       console.error('Save changes error:', error);
     }
   };
@@ -131,11 +133,11 @@ export function CommentItem({ comment, refreshComments }: CommentItemProps) {
     setIsDeleting(true);
     try {
       await deleteComment(comment.id);
-      toast.success('Comment deleted successfully.');
+      toast.success(gt('Comment deleted successfully.'));
       refreshComments();
       setIsDeleteOpen(false);
     } catch (error) {
-      toast.error('Failed to delete comment.');
+      toast.error(gt('Failed to delete comment.'));
       console.error('Delete comment error:', error);
     } finally {
       setIsDeleting(false);
@@ -165,7 +167,7 @@ export function CommentItem({ comment, refreshComments }: CommentItemProps) {
 
       // Since we no longer pre-generate URLs, show user error when API fails
       console.error('No fallback available - URLs are only generated on-demand');
-      toast.error(`Failed to download ${fileName}`);
+      toast.error(gt('Failed to download {fileName}', { fileName }));
     }
   };
 
@@ -176,7 +178,7 @@ export function CommentItem({ comment, refreshComments }: CommentItemProps) {
           <Avatar className="h-8 w-8 border border-border">
             <AvatarImage
               src={comment.author.image || getGravatarUrl(comment.author.email)}
-              alt={comment.author.name ?? 'User'}
+              alt={comment.author.name ?? gt('User')}
             />
             <AvatarFallback className="text-xs bg-muted">
               {comment.author.name?.charAt(0).toUpperCase() ?? '?'}
@@ -191,7 +193,7 @@ export function CommentItem({ comment, refreshComments }: CommentItemProps) {
                   </div>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>This user is deactivated.</p>
+                  <p>{gt('This user is deactivated.')}</p>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
@@ -202,10 +204,10 @@ export function CommentItem({ comment, refreshComments }: CommentItemProps) {
             <div className="mb-1 flex items-center justify-between gap-2">
               <div className="flex items-center gap-2">
                 <span className="leading-none font-medium">
-                  {comment.author.name ?? 'Unknown User'}
+                  {comment.author.name ?? gt('Unknown User')}
                 </span>
                 <span className="text-muted-foreground text-xs">
-                  {!isEditing ? formatRelativeTime(comment.createdAt) : 'Editing...'}
+                  {!isEditing ? formatRelativeTime(comment.createdAt) : gt('Editing...')}
                 </span>
               </div>
               {!isEditing && (
@@ -215,7 +217,7 @@ export function CommentItem({ comment, refreshComments }: CommentItemProps) {
                       variant="ghost"
                       size="icon"
                       className="h-6 w-6 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity"
-                      aria-label="Comment options"
+                      aria-label={gt('Comment options')}
                     >
                       <MoreHorizontal className="h-3.5 w-3.5" />
                     </Button>
@@ -223,14 +225,14 @@ export function CommentItem({ comment, refreshComments }: CommentItemProps) {
                   <DropdownMenuContent align="end">
                     <DropdownMenuItem onSelect={handleEditToggle}>
                       <Pencil className="mr-2 h-3.5 w-3.5" />
-                      Edit
+                      {gt('Edit')}
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       className="text-destructive focus:text-destructive focus:bg-destructive/10"
                       onSelect={() => setIsDeleteOpen(true)}
                     >
                       <Trash2 className="mr-2 h-3.5 w-3.5" />
-                      Delete
+                      {gt('Delete')}
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -248,7 +250,7 @@ export function CommentItem({ comment, refreshComments }: CommentItemProps) {
                   setEditedContent(e.target.value)
                 }
                 className="bg-muted/50 border-border min-h-[80px] text-sm resize-none"
-                placeholder="Edit comment..."
+                placeholder={gt('Edit comment...')}
                 autoFocus
               />
             )}
@@ -301,10 +303,10 @@ export function CommentItem({ comment, refreshComments }: CommentItemProps) {
             {isEditing && (
               <div className="flex justify-end gap-2 pt-3">
                 <Button variant="ghost" size="sm" onClick={handleCancelEdit}>
-                  Cancel
+                  {gt('Cancel')}
                 </Button>
                 <Button size="sm" onClick={handleSaveEdit}>
-                  Save Changes
+                  {gt('Save Changes')}
                 </Button>
               </div>
             )}
@@ -315,17 +317,17 @@ export function CommentItem({ comment, refreshComments }: CommentItemProps) {
       <Dialog open={isDeleteOpen} onOpenChange={(open) => !open && setIsDeleteOpen(false)}>
         <DialogContent className="sm:max-w-[420px]">
           <DialogHeader>
-            <DialogTitle>Delete Comment</DialogTitle>
+            <DialogTitle>{gt('Delete Comment')}</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete this comment? This cannot be undone.
+              {gt('Are you sure you want to delete this comment? This cannot be undone.')}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="gap-2">
             <Button variant="outline" onClick={() => setIsDeleteOpen(false)} disabled={isDeleting}>
-              Cancel
+              {gt('Cancel')}
             </Button>
             <Button variant="destructive" onClick={handleDeleteComment} disabled={isDeleting}>
-              {isDeleting ? 'Deleting…' : 'Delete'}
+              {isDeleting ? gt('Deleting…') : gt('Delete')}
             </Button>
           </DialogFooter>
         </DialogContent>

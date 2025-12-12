@@ -13,6 +13,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@comp/ui/card';
+import { T, useGT } from 'gt-next';
 import { ImagePlus, Loader2, Trash2 } from 'lucide-react';
 import { useAction } from 'next-safe-action/hooks';
 import Image from 'next/image';
@@ -26,26 +27,27 @@ interface UpdateOrganizationLogoProps {
 export function UpdateOrganizationLogo({ currentLogoUrl }: UpdateOrganizationLogoProps) {
   const [previewUrl, setPreviewUrl] = useState<string | null>(currentLogoUrl);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const gt = useGT();
 
   const uploadLogo = useAction(updateOrganizationLogoAction, {
     onSuccess: (result) => {
       if (result.data?.logoUrl) {
         setPreviewUrl(result.data.logoUrl);
       }
-      toast.success('Logo updated');
+      toast.success(gt('Logo updated'));
     },
     onError: (error) => {
-      toast.error(error.error.serverError || 'Failed to upload logo');
+      toast.error(error.error.serverError || gt('Failed to upload logo'));
     },
   });
 
   const removeLogo = useAction(removeOrganizationLogoAction, {
     onSuccess: () => {
       setPreviewUrl(null);
-      toast.success('Logo removed');
+      toast.success(gt('Logo removed'));
     },
     onError: () => {
-      toast.error('Failed to remove logo');
+      toast.error(gt('Failed to remove logo'));
     },
   });
 
@@ -55,13 +57,13 @@ export function UpdateOrganizationLogo({ currentLogoUrl }: UpdateOrganizationLog
 
     // Validate file type
     if (!file.type.startsWith('image/')) {
-      toast.error('Please select an image file');
+      toast.error(gt('Please select an image file'));
       return;
     }
 
     // Validate file size (2MB)
     if (file.size > 2 * 1024 * 1024) {
-      toast.error('Logo must be less than 2MB');
+      toast.error(gt('Logo must be less than 2MB'));
       return;
     }
 
@@ -88,11 +90,15 @@ export function UpdateOrganizationLogo({ currentLogoUrl }: UpdateOrganizationLog
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Organization Logo</CardTitle>
+        <CardTitle>
+          <T>Organization Logo</T>
+        </CardTitle>
         <CardDescription>
-          <div className="max-w-[600px]">
-            Upload your organization's logo. This will be displayed in reports and the trust portal.
-          </div>
+          <T>
+            <div className="max-w-[600px]">
+              Upload your organization's logo. This will be displayed in reports and the trust portal.
+            </div>
+          </T>
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -102,7 +108,7 @@ export function UpdateOrganizationLogo({ currentLogoUrl }: UpdateOrganizationLog
             {previewUrl ? (
               <Image
                 src={previewUrl}
-                alt="Organization logo"
+                alt={gt('Organization logo')}
                 fill
                 className="object-contain p-2"
               />
@@ -129,12 +135,12 @@ export function UpdateOrganizationLogo({ currentLogoUrl }: UpdateOrganizationLog
               disabled={isLoading}
             >
               {uploadLogo.status === 'executing' ? (
-                <>
+                <T>
                   <Loader2 className="h-4 w-4 animate-spin" />
                   Uploading...
-                </>
+                </T>
               ) : (
-                'Upload logo'
+                <T>Upload logo</T>
               )}
             </Button>
             {previewUrl && (
@@ -147,15 +153,15 @@ export function UpdateOrganizationLogo({ currentLogoUrl }: UpdateOrganizationLog
                 className="text-destructive hover:text-destructive"
               >
                 {removeLogo.status === 'executing' ? (
-                  <>
+                  <T>
                     <Loader2 className="h-4 w-4 animate-spin" />
                     Removing...
-                  </>
+                  </T>
                 ) : (
-                  <>
+                  <T>
                     <Trash2 className="h-4 w-4" />
                     Remove
-                  </>
+                  </T>
                 )}
               </Button>
             )}
@@ -163,9 +169,11 @@ export function UpdateOrganizationLogo({ currentLogoUrl }: UpdateOrganizationLog
         </div>
       </CardContent>
       <CardFooter>
-        <div className="text-muted-foreground text-xs">
-          Recommended: Square image, at least 200x200px. Max 2MB.
-        </div>
+        <T>
+          <div className="text-muted-foreground text-xs">
+            Recommended: Square image, at least 200x200px. Max 2MB.
+          </div>
+        </T>
       </CardFooter>
     </Card>
   );

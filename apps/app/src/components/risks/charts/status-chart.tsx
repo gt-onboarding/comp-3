@@ -1,6 +1,7 @@
 'use client';
 
 import { ClientTooltip } from '@comp/ui/chart-tooltip';
+import { T } from 'gt-next';
 import { format, max, scaleBand, scaleLinear } from 'd3';
 import { type CSSProperties } from 'react';
 
@@ -46,9 +47,11 @@ export function StatusChart({ data }: StatusChartProps) {
 
   if (sortedData.length === 0) {
     return (
-      <div className="text-muted-foreground flex h-[300px] items-center justify-center">
-        No statuses with risks found
-      </div>
+      <T>
+        <div className="text-muted-foreground flex h-[300px] items-center justify-center">
+          No statuses with risks found
+        </div>
+      </T>
     );
   }
 

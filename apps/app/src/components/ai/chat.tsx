@@ -5,6 +5,7 @@ import { useChat } from '@ai-sdk/react';
 import { ScrollArea } from '@comp/ui/scroll-area';
 import { DefaultChatTransport, lastAssistantMessageIsCompleteWithToolCalls } from 'ai';
 import { useState } from 'react';
+import { T, Var } from 'gt-next';
 import { ChatEmpty } from './chat-empty';
 import { ChatTextarea } from './chat-text-area';
 import { Messages } from './messages';
@@ -25,7 +26,11 @@ export default function Chat() {
 
   const isLoading = status === 'streaming' || status === 'submitted';
 
-  if (error) return <div>{error.message}</div>;
+  if (error) return (
+    <T>
+      <div><Var>{error.message}</Var></div>
+    </T>
+  );
 
   return (
     <div className="relative flex h-full flex-col">

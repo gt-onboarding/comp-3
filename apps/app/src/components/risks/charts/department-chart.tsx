@@ -1,6 +1,7 @@
 'use client';
 
 import { ClientTooltip } from '@comp/ui/chart-tooltip';
+import { T } from 'gt-next';
 import { format, max, scaleBand, scaleLinear } from 'd3';
 import { type CSSProperties } from 'react';
 
@@ -33,9 +34,11 @@ export function DepartmentChart({ data, showEmptyDepartments = true }: Departmen
   // Return early with a message if no departments have risks
   if (sortedData.length === 0) {
     return (
-      <div className="text-muted-foreground flex h-[300px] items-center justify-center">
-        No departments with risks found
-      </div>
+      <T>
+        <div className="text-muted-foreground flex h-[300px] items-center justify-center">
+          No departments with risks found
+        </div>
+      </T>
     );
   }
 
