@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { MiniDataStream } from './mini-data-stream';
+import { msg, useMessages } from 'gt-next';
 
 interface WorkItem {
   id: string;
@@ -28,87 +29,87 @@ interface WorkItem {
 const INITIAL_WORK_ITEMS: WorkItem[] = [
   {
     id: '1',
-    title: 'Drafting Information Security Policy',
+    title: msg('Drafting Information Security Policy'),
     type: 'policy',
     status: 'pending',
-    detail: 'Customizing based on your AWS infrastructure and security controls',
+    detail: msg('Customizing based on your AWS infrastructure and security controls'),
   },
   {
     id: '2',
-    title: 'Researching Stripe Compliance',
+    title: msg('Researching Stripe Compliance'),
     type: 'vendor',
     status: 'pending',
-    detail: 'Analyzing PCI DSS compliance and payment security certifications',
+    detail: msg('Analyzing PCI DSS compliance and payment security certifications'),
   },
   {
     id: '3',
-    title: 'Assessing Data Privacy Risks',
+    title: msg('Assessing Data Privacy Risks'),
     type: 'risk',
     status: 'pending',
-    detail: 'Mapping personal data flows across your systems',
+    detail: msg('Mapping personal data flows across your systems'),
   },
   {
     id: '4',
-    title: 'Writing Access Control Policy',
+    title: msg('Writing Access Control Policy'),
     type: 'policy',
     status: 'pending',
-    detail: 'Incorporating your Okta SSO and role-based permissions',
+    detail: msg('Incorporating your Okta SSO and role-based permissions'),
   },
   {
     id: '5',
-    title: 'Implementing Encryption Controls',
+    title: msg('Implementing Encryption Controls'),
     type: 'control',
     status: 'pending',
-    detail: 'Configuring TLS, data-at-rest, and key management standards',
+    detail: msg('Configuring TLS, data-at-rest, and key management standards'),
   },
   {
     id: '6',
-    title: 'Auditing GitHub Security',
+    title: msg('Auditing GitHub Security'),
     type: 'vendor',
     status: 'pending',
-    detail: 'Reviewing branch protection, access controls, and audit logs',
+    detail: msg('Reviewing branch protection, access controls, and audit logs'),
   },
   {
     id: '7',
-    title: 'Creating Incident Response Plan',
+    title: msg('Creating Incident Response Plan'),
     type: 'policy',
     status: 'pending',
-    detail: 'Building runbooks for security events and data breaches',
+    detail: msg('Building runbooks for security events and data breaches'),
   },
   {
     id: '8',
-    title: 'Collecting AWS Evidence',
+    title: msg('Collecting AWS Evidence'),
     type: 'evidence',
     status: 'pending',
-    detail: 'Gathering CloudTrail logs, IAM policies, and security configurations',
+    detail: msg('Gathering CloudTrail logs, IAM policies, and security configurations'),
   },
   {
     id: '9',
-    title: 'Evaluating Third-Party Risks',
+    title: msg('Evaluating Third-Party Risks'),
     type: 'risk',
     status: 'pending',
-    detail: 'Scoring vendor security posture and compliance gaps',
+    detail: msg('Scoring vendor security posture and compliance gaps'),
   },
   {
     id: '10',
-    title: 'Drafting Data Retention Policy',
+    title: msg('Drafting Data Retention Policy'),
     type: 'policy',
     status: 'pending',
-    detail: 'Aligning with GDPR requirements and business needs',
+    detail: msg('Aligning with GDPR requirements and business needs'),
   },
   {
     id: '11',
-    title: 'Monitoring Security Posture',
+    title: msg('Monitoring Security Posture'),
     type: 'evidence',
     status: 'pending',
-    detail: 'Continuous compliance checks across cloud infrastructure',
+    detail: msg('Continuous compliance checks across cloud infrastructure'),
   },
   {
     id: '12',
-    title: 'Building Vendor Management Program',
+    title: msg('Building Vendor Management Program'),
     type: 'control',
     status: 'pending',
-    detail: 'Establishing review cycles and risk assessment workflows',
+    detail: msg('Establishing review cycles and risk assessment workflows'),
   },
 ];
 
@@ -148,6 +149,7 @@ const getIcon = (type: WorkItem['type']) => {
 };
 
 export function AiWorkPreview() {
+  const m = useMessages();
   const [workItems, setWorkItems] = useState<WorkItem[]>(INITIAL_WORK_ITEMS);
   const [currentIndex, setCurrentIndex] = useState(0);
 
@@ -243,13 +245,12 @@ export function AiWorkPreview() {
           <Sparkles className="h-6 w-6 text-purple-600 dark:text-purple-400" />
         </div>
         <div className="flex flex-col gap-4">
-          <p className="text-2xl font-bold">Our AI is getting you audit-ready</p>
+          <p className="text-2xl font-bold">{m(msg('Our AI is getting you audit-ready'))}</p>
           <p className="text-md">
-            We have begun drafting personalized policies, researching vendor compliance, and
-            assessing potential risks to get you audit-ready.
+            {m(msg('We have begun drafting personalized policies, researching vendor compliance, and assessing potential risks to get you audit-ready.'))}
           </p>
           <p className="text-md">
-            Select a plan to gain access to your personalized compliance program.
+            {m(msg('Select a plan to gain access to your personalized compliance program.'))}
           </p>
         </div>
       </div>
@@ -313,7 +314,7 @@ export function AiWorkPreview() {
                             isPrev && isDone && 'line-through text-muted-foreground',
                           )}
                         >
-                          {item.title}
+                          {m(item.title)}
                         </p>
                         <span
                           className={cn(
@@ -335,7 +336,7 @@ export function AiWorkPreview() {
                       </div>
 
                       {item.detail && isCurrent && !isProcessing && (
-                        <p className="text-xs text-muted-foreground mt-1">{item.detail}</p>
+                        <p className="text-xs text-muted-foreground mt-1">{m(item.detail)}</p>
                       )}
                     </div>
                   </div>

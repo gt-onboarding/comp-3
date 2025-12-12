@@ -6,6 +6,7 @@ import { Impact, Likelihood } from '@db';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Loader2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { useGT, msg, useMessages } from 'gt-next';
 
 const LIKELIHOOD_SCORES: Record<Likelihood, number> = {
   very_unlikely: 1,
@@ -62,16 +63,28 @@ const getRiskColor = (level: string) => {
   }
 };
 
-const probabilityLevels = ['Very Likely', 'Likely', 'Possible', 'Unlikely', 'Very Unlikely'];
+const probabilityLevels = [
+  msg('Very Likely'),
+  msg('Likely'),
+  msg('Possible'),
+  msg('Unlikely'),
+  msg('Very Unlikely'),
+];
 const probabilityNumbers = ['5', '4', '3', '2', '1'];
 const probabilityLabels = [
-  'Very Likely (5)',
-  'Likely (4)',
-  'Possible (3)',
-  'Unlikely (2)',
-  'Very Unlikely (1)',
+  msg('Very Likely (5)'),
+  msg('Likely (4)'),
+  msg('Possible (3)'),
+  msg('Unlikely (2)'),
+  msg('Very Unlikely (1)'),
 ];
-const impactLevels = ['Insignificant', 'Minor', 'Moderate', 'Major', 'Severe'];
+const impactLevels = [
+  msg('Insignificant'),
+  msg('Minor'),
+  msg('Moderate'),
+  msg('Major'),
+  msg('Severe'),
+];
 const impactNumbers = ['1', '2', '3', '4', '5'];
 
 interface RiskMatrixChartProps {
@@ -91,6 +104,8 @@ export function RiskMatrixChart({
   activeImpact: initialImpactProp,
   saveAction,
 }: RiskMatrixChartProps) {
+  const gt = useGT();
+  const m = useMessages();
   const [initialLikelihood, setInitialLikelihood] = useState<Likelihood>(initialLikelihoodProp);
   const [initialImpact, setInitialImpact] = useState<Impact>(initialImpactProp);
   const [activeLikelihood, setActiveLikelihood] = useState<Likelihood>(initialLikelihoodProp);
@@ -106,15 +121,15 @@ export function RiskMatrixChart({
     setActiveImpact(initialImpactProp);
   }, [initialImpactProp]);
 
-  const activeProbability = probabilityLevels[VISUAL_LIKELIHOOD_ORDER.indexOf(activeLikelihood)];
-  const activeImpactLevel = impactLevels[VISUAL_IMPACT_ORDER.indexOf(activeImpact)];
+  const activeProbability = m(probabilityLevels[VISUAL_LIKELIHOOD_ORDER.indexOf(activeLikelihood)]);
+  const activeImpactLevel = m(impactLevels[VISUAL_IMPACT_ORDER.indexOf(activeImpact)]);
 
   // Create risk data
   const riskData: RiskCell[] = probabilityLevels.flatMap((probability) =>
     impactLevels.map((impact) => {
       const likelihoodScore =
-        LIKELIHOOD_SCORES[VISUAL_LIKELIHOOD_ORDER[probabilityLevels.indexOf(probability)]];
-      const impactScore = IMPACT_SCORES[VISUAL_IMPACT_ORDER[impactLevels.indexOf(impact)]];
+        LIKELIHOOD_SCORES[VISUAL_LIKELIHOOD_ORDER[probabilityLevels.findIndex((p) => p === probability)]];
+      const impactScore = IMPACT_SCORES[VISUAL_IMPACT_ORDER[impactLevels.findIndex((i) => i === impact)]];
       const score = likelihoodScore * impactScore;
 
       let level: RiskCell['level'] = 'very-low';
@@ -124,17 +139,17 @@ export function RiskMatrixChart({
       else if (score > 1) level = 'low';
 
       return {
-        probability,
-        impact,
+        probability: m(probability),
+        impact: m(impact),
         level,
-        value: probability === activeProbability && impact === activeImpactLevel ? 1 : undefined,
+        value: m(probability) === activeProbability && m(impact) === activeImpactLevel ? 1 : undefined,
       };
     }),
   );
 
   const handleCellClick = (probability: string, impact: string) => {
-    const likelihoodIdx = probabilityLevels.indexOf(probability);
-    const impactIdx = impactLevels.indexOf(impact);
+    const likelihoodIdx = probabilityLevels.findIndex((p) => m(p) === probability);
+    const impactIdx = impactLevels.findIndex((i) => m(i) === impact);
     const newLikelihood = VISUAL_LIKELIHOOD_ORDER[likelihoodIdx];
     const newImpact = VISUAL_IMPACT_ORDER[impactIdx];
     setActiveLikelihood(newLikelihood);
@@ -175,7 +190,7 @@ export function RiskMatrixChart({
                 transition={{ duration: 0.15, ease: 'easeOut' }}
               >
                 <Button onClick={handleSave} variant="default" disabled={loading}>
-                  {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Save'}
+                  {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : gt('Save')}
                 </Button>
               </motion.div>
             )}
@@ -189,20 +204,20 @@ export function RiskMatrixChart({
               <div className="h-12" />
               {impactLevels.map((impact, index) => (
                 <div key={impact} className="flex flex-col items-center justify-center">
-                  <span className="text-center text-xs leading-tight">{impact}</span>
+                  <span className="text-center text-xs leading-tight">{m(impact)}</span>
                 </div>
               ))}
               {probabilityLevels.map((probability, rowIdx) => (
                 <div key={probability} className="contents">
                   <div
                     className="mr-4 flex flex-col items-center justify-center"
-                    title={probabilityLabels[rowIdx]}
+                    title={m(probabilityLabels[rowIdx])}
                   >
                     <span className="text-xs">{probabilityNumbers[rowIdx]}</span>
                   </div>
                   {impactLevels.map((impact, colIdx) => {
                     const cell = riskData.find(
-                      (item) => item.probability === probability && item.impact === impact,
+                      (item) => item.probability === m(probability) && item.impact === m(impact),
                     );
                     let rounding = '';
                     if (rowIdx === 0 && colIdx === 0) rounding = 'rounded-tl-lg';
@@ -219,7 +234,7 @@ export function RiskMatrixChart({
                       <div
                         key={`${probability}-${impact}`}
                         className={`relative h-12 cursor-pointer border transition-all duration-200 ${getRiskColor(cell?.level || 'very-low')} flex items-center justify-center ${rounding} `}
-                        onClick={() => handleCellClick(probability, impact)}
+                        onClick={() => handleCellClick(m(probability), m(impact))}
                       >
                         {cell?.value && (
                           <div className="h-3 w-3 animate-pulse rounded-full bg-white shadow-lg" />
@@ -231,7 +246,7 @@ export function RiskMatrixChart({
               ))}
             </div>
             <div className="mt-2 flex justify-center">
-              <span className="text-xs">{'Impact'}</span>
+              <span className="text-xs">{gt('Impact')}</span>
             </div>
           </div>
         </div>

@@ -29,6 +29,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@comp/ui/select';
+import { T, useGT } from 'gt-next';
 import { Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -54,10 +55,11 @@ export function TransferOwnership({ members, isOwner }: TransferOwnershipProps) 
   const [isTransferring, setIsTransferring] = useState(false);
   const router = useRouter();
   const api = useApi();
+  const gt = useGT();
 
   const handleTransfer = () => {
     if (!selectedMemberId) {
-      toast.error('Please select a new owner');
+      toast.error(gt('Please select a new owner'));
       return;
     }
     setShowConfirmDialog(true);
@@ -78,19 +80,19 @@ export function TransferOwnership({ members, isOwner }: TransferOwnershipProps) 
 
       if (response.error || !response.data?.success) {
         // Check for error in response.error (non-200 responses) or response.data.message (200 with success: false)
-        const errorMessage = response.error || response.data?.message || 'Failed to transfer ownership';
+        const errorMessage = response.error || response.data?.message || gt('Failed to transfer ownership');
         toast.error(errorMessage);
         return;
       }
 
-      toast.success('Ownership transferred successfully. You are now an admin.');
+      toast.success(gt('Ownership transferred successfully. You are now an admin.'));
       setSelectedMemberId('');
       setShowConfirmDialog(false);
       setConfirmationText('');
       router.refresh();
     } catch (error) {
       console.error('Error transferring ownership:', error);
-      toast.error('Failed to transfer ownership');
+      toast.error(gt('Failed to transfer ownership'));
     } finally {
       setIsTransferring(false);
     }
@@ -106,19 +108,25 @@ export function TransferOwnership({ members, isOwner }: TransferOwnershipProps) 
     return (
       <Card className="border-destructive border border-2">
         <CardHeader>
-          <CardTitle>Transfer ownership</CardTitle>
+          <CardTitle>
+            <T>Transfer ownership</T>
+          </CardTitle>
           <CardDescription>
-            <div className="max-w-[600px]">
-              Transfer the ownership of this organization to another member. You will become an
-              admin after the transfer.
-            </div>
+            <T>
+              <div className="max-w-[600px]">
+                Transfer the ownership of this organization to another member. You will become an
+                admin after the transfer.
+              </div>
+            </T>
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <p className="text-muted-foreground text-sm">
-            You need to add other members to your organization before you can transfer ownership.
-            Invite team members from the People section.
-          </p>
+          <T>
+            <p className="text-muted-foreground text-sm">
+              You need to add other members to your organization before you can transfer ownership.
+              Invite team members from the People section.
+            </p>
+          </T>
         </CardContent>
       </Card>
     );
@@ -128,18 +136,22 @@ export function TransferOwnership({ members, isOwner }: TransferOwnershipProps) 
     <>
       <Card className="border-destructive border border-2">
         <CardHeader>
-          <CardTitle>Transfer ownership</CardTitle>
+          <CardTitle>
+            <T>Transfer ownership</T>
+          </CardTitle>
           <CardDescription>
-            <div className="max-w-[600px]">
-              Transfer the ownership of this organization to another member. You will become an
-              admin after the transfer.
-            </div>
+            <T>
+              <div className="max-w-[600px]">
+                Transfer the ownership of this organization to another member. You will become an
+                admin after the transfer.
+              </div>
+            </T>
           </CardDescription>
         </CardHeader>
         <CardContent>
           <Select value={selectedMemberId} onValueChange={setSelectedMemberId}>
             <SelectTrigger className="md:max-w-[300px]">
-              <SelectValue placeholder="Select new owner" />
+              <SelectValue placeholder={gt('Select new owner')} />
             </SelectTrigger>
             <SelectContent>
               {members.map((member) => (
@@ -151,9 +163,11 @@ export function TransferOwnership({ members, isOwner }: TransferOwnershipProps) 
           </Select>
         </CardContent>
         <CardFooter className="flex justify-between">
-          <div className="text-muted-foreground text-xs">
-            This action cannot be undone without the new owner transferring back.
-          </div>
+          <T>
+            <div className="text-muted-foreground text-xs">
+              This action cannot be undone without the new owner transferring back.
+            </div>
+          </T>
           <Button
             variant="destructive"
             size="sm"
@@ -162,7 +176,7 @@ export function TransferOwnership({ members, isOwner }: TransferOwnershipProps) 
             className="hover:bg-destructive/90"
           >
             {isTransferring ? <Loader2 className="mr-1 h-4 w-4 animate-spin" /> : null}
-            Transfer ownership
+            <T>Transfer ownership</T>
           </Button>
         </CardFooter>
       </Card>
@@ -170,33 +184,41 @@ export function TransferOwnership({ members, isOwner }: TransferOwnershipProps) 
       <AlertDialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogTitle>
+              <T>Are you absolutely sure?</T>
+            </AlertDialogTitle>
             <AlertDialogDescription>
-              This will transfer ownership of the organization to the selected member. You will
-              become an admin and will no longer have owner privileges. This action cannot be
-              undone without the new owner transferring ownership back to you.
+              <T>
+                This will transfer ownership of the organization to the selected member. You will
+                become an admin and will no longer have owner privileges. This action cannot be
+                undone without the new owner transferring ownership back to you.
+              </T>
             </AlertDialogDescription>
           </AlertDialogHeader>
 
           <div className="mt-2 flex flex-col gap-2">
-            <Label htmlFor="confirm-transfer">Type &apos;transfer&apos; to confirm</Label>
+            <Label htmlFor="confirm-transfer">
+              <T>Type &apos;transfer&apos; to confirm</T>
+            </Label>
             <Input
               id="confirm-transfer"
               value={confirmationText}
               onChange={(e) => setConfirmationText(e.target.value)}
-              placeholder="transfer"
+              placeholder={gt('transfer')}
             />
           </div>
 
           <AlertDialogFooter className="mt-4">
-            <AlertDialogCancel onClick={() => setConfirmationText('')}>Cancel</AlertDialogCancel>
+            <AlertDialogCancel onClick={() => setConfirmationText('')}>
+              <T>Cancel</T>
+            </AlertDialogCancel>
             <AlertDialogAction
               onClick={confirmTransfer}
               disabled={confirmationText !== 'transfer' || isTransferring}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
               {isTransferring ? <Loader2 className="mr-1 h-4 w-4 animate-spin" /> : null}
-              Transfer ownership
+              <T>Transfer ownership</T>
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

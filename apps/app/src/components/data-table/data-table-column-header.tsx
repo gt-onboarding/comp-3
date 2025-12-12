@@ -11,6 +11,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@comp/ui/dropdown-menu';
+import { T } from 'gt-next';
 
 interface DataTableColumnHeaderProps<TData, TValue>
   extends React.ComponentProps<typeof DropdownMenuTrigger> {
@@ -75,10 +76,12 @@ export function DataTableColumnHeader<TData, TValue>({
                 }
               }}
             >
-              <div className="flex items-center gap-2">
-                <ChevronUp className="size-4" />
-                Ascend
-              </div>
+              <T>
+                <div className="flex items-center gap-2">
+                  <ChevronUp className="size-4" />
+                  Ascend
+                </div>
+              </T>
             </DropdownMenuCheckboxItem>
             <DropdownMenuCheckboxItem
               className="[&_svg]:text-muted-foreground relative pr-8 pl-2 [&>span:first-child]:right-2 [&>span:first-child]:left-auto"
@@ -97,10 +100,12 @@ export function DataTableColumnHeader<TData, TValue>({
                 }
               }}
             >
-              <div className="flex items-center gap-2">
-                <ChevronDown className="size-4" />
-                Descend
-              </div>
+              <T>
+                <div className="flex items-center gap-2">
+                  <ChevronDown className="size-4" />
+                  Descend
+                </div>
+              </T>
             </DropdownMenuCheckboxItem>
             {(() => {
               try {
@@ -116,10 +121,12 @@ export function DataTableColumnHeader<TData, TValue>({
                         }
                       }}
                     >
-                      <div className="flex items-center gap-2">
-                        <X className="size-4" />
-                        Reset
-                      </div>
+                      <T>
+                        <div className="flex items-center gap-2">
+                          <X className="size-4" />
+                          Reset
+                        </div>
+                      </T>
                     </DropdownMenuItem>
                   );
                 }

@@ -2,6 +2,7 @@
 
 import { updateInherentRiskAction } from '@/actions/risk/update-inherent-risk-action';
 import type { Risk } from '@db';
+import { useGT } from 'gt-next';
 import { RiskMatrixChart } from './RiskMatrixChart';
 
 interface InherentRiskChartProps {
@@ -9,10 +10,11 @@ interface InherentRiskChartProps {
 }
 
 export function InherentRiskChart({ risk }: InherentRiskChartProps) {
+  const gt = useGT();
   return (
     <RiskMatrixChart
-      title={'Inherent Risk'}
-      description={'Initial risk level before any controls are applied'}
+      title={gt('Inherent Risk')}
+      description={gt('Initial risk level before any controls are applied')}
       riskId={risk.id}
       activeLikelihood={risk.likelihood}
       activeImpact={risk.impact}

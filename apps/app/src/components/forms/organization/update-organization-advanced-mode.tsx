@@ -13,6 +13,7 @@ import {
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@comp/ui/form';
 import { Switch } from '@comp/ui/switch';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { T, useGT } from 'gt-next';
 import { Loader2 } from 'lucide-react';
 import { useAction } from 'next-safe-action/hooks';
 import { useForm } from 'react-hook-form';
@@ -24,12 +25,13 @@ export function UpdateOrganizationAdvancedMode({
 }: {
   advancedModeEnabled: boolean;
 }) {
+  const gt = useGT();
   const updateAdvancedMode = useAction(updateOrganizationAdvancedModeAction, {
     onSuccess: () => {
-      toast.success('Advanced mode setting updated');
+      toast.success(gt('Advanced mode setting updated'));
     },
     onError: () => {
-      toast.error('Error updating advanced mode setting');
+      toast.error(gt('Error updating advanced mode setting'));
     },
   });
 
@@ -49,13 +51,17 @@ export function UpdateOrganizationAdvancedMode({
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
         <Card>
           <CardHeader>
-            <CardTitle>Advanced Mode</CardTitle>
+            <CardTitle>
+              <T>Advanced Mode</T>
+            </CardTitle>
             <CardDescription>
-              <div className="max-w-[600px]">
-                Enable advanced mode to access additional features like the Controls page. This
-                setting is designed for users who need access to more detailed compliance management
-                tools.
-              </div>
+              <T>
+                <div className="max-w-[600px]">
+                  Enable advanced mode to access additional features like the Controls page. This
+                  setting is designed for users who need access to more detailed compliance management
+                  tools.
+                </div>
+              </T>
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -65,10 +71,14 @@ export function UpdateOrganizationAdvancedMode({
               render={({ field }) => (
                 <FormItem className="flex flex-row items-center justify-between rounded-xs border p-3">
                   <div className="space-y-0.5">
-                    <div className="text-base">Advanced Mode</div>
-                    <div className="text-muted-foreground text-sm">
-                      Show advanced features and pages
-                    </div>
+                    <T>
+                      <div className="text-base">Advanced Mode</div>
+                    </T>
+                    <T>
+                      <div className="text-muted-foreground text-sm">
+                        Show advanced features and pages
+                      </div>
+                    </T>
                   </div>
                   <FormControl>
                     <Switch
@@ -86,14 +96,18 @@ export function UpdateOrganizationAdvancedMode({
             />
           </CardContent>
           <CardFooter className="flex justify-between">
-            <div className="text-muted-foreground text-xs">
-              Changes are saved automatically when toggled.
-            </div>
-            {updateAdvancedMode.status === 'executing' && (
-              <div className="flex items-center text-muted-foreground text-sm">
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Saving...
+            <T>
+              <div className="text-muted-foreground text-xs">
+                Changes are saved automatically when toggled.
               </div>
+            </T>
+            {updateAdvancedMode.status === 'executing' && (
+              <T>
+                <div className="flex items-center text-muted-foreground text-sm">
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Saving...
+                </div>
+              </T>
             )}
           </CardFooter>
         </Card>

@@ -3,6 +3,7 @@
 import { PieChart } from '@/components/ui/pie-chart';
 import { Card, CardContent, CardHeader, CardTitle } from '@comp/ui/card';
 import { cn } from '@comp/ui/cn';
+import { T, useGT } from 'gt-next';
 
 interface Props {
   totalPolicies: number;
@@ -19,6 +20,7 @@ export function PoliciesStatus({
   archivedPolicies,
   needsReviewPolicies,
 }: Props) {
+  const gt = useGT();
   const statusCounts = {
     published: publishedPolicies,
     draft: draftPolicies,
@@ -28,25 +30,25 @@ export function PoliciesStatus({
 
   const data = [
     {
-      name: 'Published',
+      name: gt('Published'),
       value: statusCounts.published,
       color: 'var(--chart-closed)',
       colorClass: 'bg-[var(--chart-closed)]',
     },
     {
-      name: 'Draft',
+      name: gt('Draft'),
       value: statusCounts.draft,
       color: 'var(--chart-open)',
       colorClass: 'bg-[var(--chart-open)]',
     },
     {
-      name: 'Archived',
+      name: gt('Archived'),
       value: statusCounts.archived,
       color: 'var(--chart-pending)',
       colorClass: 'bg-[var(--chart-pending)]',
     },
     {
-      name: 'Needs Review',
+      name: gt('Needs Review'),
       value: statusCounts.needs_review,
       color: 'hsl(var(--destructive))',
       colorClass: 'bg-[hsl(var(--destructive))]',
@@ -56,7 +58,9 @@ export function PoliciesStatus({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>{'Policy by Status'}</CardTitle>
+        <T>
+          <CardTitle>Policy by Status</CardTitle>
+        </T>
       </CardHeader>
       <CardContent>
         <PieChart data={data} />

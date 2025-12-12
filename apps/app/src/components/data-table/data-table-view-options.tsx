@@ -15,12 +15,14 @@ import {
 } from '@comp/ui/command';
 import { Popover, PopoverContent, PopoverTrigger } from '@comp/ui/popover';
 import * as React from 'react';
+import { T, useGT } from 'gt-next';
 
 interface DataTableViewOptionsProps<TData> {
   table: Table<TData>;
 }
 
 export function DataTableViewOptions<TData>({ table }: DataTableViewOptionsProps<TData>) {
+  const gt = useGT();
   const columns = React.useMemo(
     () =>
       table
@@ -33,21 +35,21 @@ export function DataTableViewOptions<TData>({ table }: DataTableViewOptionsProps
     <Popover>
       <PopoverTrigger asChild>
         <Button
-          aria-label="Toggle columns"
+          aria-label={gt('Toggle columns')}
           variant="outline"
           size="sm"
           className="ml-auto hidden h-8 gap-1.5 lg:flex"
         >
           <Settings2 className="size-4" />
-          View
+          <T>View</T>
           <ChevronsUpDown className="ml-auto size-4 opacity-50" />
         </Button>
       </PopoverTrigger>
       <PopoverContent align="end" className="w-44 p-0">
         <Command>
-          <CommandInput placeholder="Search columns..." />
+          <CommandInput placeholder={gt('Search columns...')} />
           <CommandList>
-            <CommandEmpty>No columns found.</CommandEmpty>
+            <CommandEmpty><T>No columns found.</T></CommandEmpty>
             <CommandGroup>
               {columns.map((column) => (
                 <CommandItem

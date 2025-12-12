@@ -7,6 +7,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel } from '@comp/ui/form
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@comp/ui/select';
 import { Impact, Likelihood } from '@db';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { msg, useGT, useMessages } from 'gt-next';
 import { Loader2 } from 'lucide-react';
 import { useAction } from 'next-safe-action/hooks';
 import { useQueryState } from 'nuqs';
@@ -22,20 +23,20 @@ interface InherentRiskFormProps {
 
 // Map for displaying readable labels
 const LIKELIHOOD_LABELS: Record<Likelihood, string> = {
-  [Likelihood.very_unlikely]: 'Very Unlikely',
-  [Likelihood.unlikely]: 'Unlikely',
-  [Likelihood.possible]: 'Possible',
-  [Likelihood.likely]: 'Likely',
-  [Likelihood.very_likely]: 'Very Likely',
+  [Likelihood.very_unlikely]: msg('Very Unlikely'),
+  [Likelihood.unlikely]: msg('Unlikely'),
+  [Likelihood.possible]: msg('Possible'),
+  [Likelihood.likely]: msg('Likely'),
+  [Likelihood.very_likely]: msg('Very Likely'),
 };
 
 // Map for displaying readable labels
 const IMPACT_LABELS: Record<Impact, string> = {
-  [Impact.insignificant]: 'Insignificant',
-  [Impact.minor]: 'Minor',
-  [Impact.moderate]: 'Moderate',
-  [Impact.major]: 'Major',
-  [Impact.severe]: 'Severe',
+  [Impact.insignificant]: msg('Insignificant'),
+  [Impact.minor]: msg('Minor'),
+  [Impact.moderate]: msg('Moderate'),
+  [Impact.major]: msg('Major'),
+  [Impact.severe]: msg('Severe'),
 };
 
 export function InherentRiskForm({
@@ -43,14 +44,16 @@ export function InherentRiskForm({
   initialProbability,
   initialImpact,
 }: InherentRiskFormProps) {
+  const gt = useGT();
+  const m = useMessages();
   const [_, setOpen] = useQueryState('inherent-risk-sheet');
   const updateInherentRisk = useAction(updateInherentRiskAction, {
     onSuccess: () => {
-      toast.success('Inherent risk updated successfully');
+      toast.success(gt('Inherent risk updated successfully'));
       setOpen(null);
     },
     onError: () => {
-      toast.error('Failed to update inherent risk');
+      toast.error(gt('Failed to update inherent risk'));
     },
   });
 
@@ -75,17 +78,17 @@ export function InherentRiskForm({
           name="probability"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>{'Probability'}</FormLabel>
+              <FormLabel>{gt('Probability')}</FormLabel>
               <Select onValueChange={field.onChange} value={field.value}>
                 <FormControl>
                   <SelectTrigger>
-                    <SelectValue placeholder={'Select a probability'} />
+                    <SelectValue placeholder={gt('Select a probability')} />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
                   {Object.entries(LIKELIHOOD_LABELS).map(([value, label]) => (
                     <SelectItem key={value} value={value}>
-                      {label}
+                      {m(label)}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -99,17 +102,17 @@ export function InherentRiskForm({
           name="impact"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>{'Impact'}</FormLabel>
+              <FormLabel>{gt('Impact')}</FormLabel>
               <Select onValueChange={field.onChange} value={field.value}>
                 <FormControl>
                   <SelectTrigger>
-                    <SelectValue placeholder={'Select an impact'} />
+                    <SelectValue placeholder={gt('Select an impact')} />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
                   {Object.entries(IMPACT_LABELS).map(([value, label]) => (
                     <SelectItem key={value} value={value}>
-                      {label}
+                      {m(label)}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -127,7 +130,7 @@ export function InherentRiskForm({
             {updateInherentRisk.status === 'executing' ? (
               <Loader2 className="h-4 w-4 animate-spin" />
             ) : (
-              'Save'
+              gt('Save')
             )}
           </Button>
         </div>

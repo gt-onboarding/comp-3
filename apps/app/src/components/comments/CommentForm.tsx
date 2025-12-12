@@ -16,6 +16,7 @@ import { Camera, FileIcon, Loader2, Paperclip, X } from 'lucide-react';
 import type React from 'react';
 import { useCallback, useRef, useState } from 'react';
 import { toast } from 'sonner';
+import { T, useGT } from 'gt-next';
 
 interface CommentFormProps {
   entityId: string;
@@ -23,6 +24,7 @@ interface CommentFormProps {
 }
 
 export function CommentForm({ entityId, entityType }: CommentFormProps) {
+  const gt = useGT();
   const [newComment, setNewComment] = useState('');
   const [pendingFiles, setPendingFiles] = useState<File[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -50,7 +52,7 @@ export function CommentForm({ entityId, entityType }: CommentFormProps) {
 
     for (const file of newFiles) {
       if (file.size > MAX_FILE_SIZE_BYTES) {
-        toast.error(`File "${file.name}" exceeds the ${MAX_FILE_SIZE_MB}MB limit.`);
+        toast.error(gt('File "{fileName}" exceeds the {fileSize}MB limit.', { fileName: file.name, fileSize: MAX_FILE_SIZE_MB }));
         if (fileInputRef.current) fileInputRef.current.value = '';
         return;
       }
@@ -65,12 +67,12 @@ export function CommentForm({ entityId, entityType }: CommentFormProps) {
     if (filesToAdd.length > 0) {
       setPendingFiles((prev) => [...prev, ...filesToAdd]);
       filesToAdd.forEach((file) => {
-        toast.success(`File "${file.name}" ready for attachment.`);
+        toast.success(gt('File "{fileName}" ready for attachment.', { fileName: file.name }));
       });
       setFilesToAdd([]);
     }
     if (fileInputRef.current) fileInputRef.current.value = '';
-  }, [filesToAdd]);
+  }, [filesToAdd, gt]);
 
   const handleReminderClose = useCallback(() => {
     setShowReminderDialog(false);
@@ -80,7 +82,7 @@ export function CommentForm({ entityId, entityType }: CommentFormProps) {
 
   const handleRemovePendingFile = (fileIndexToRemove: number) => {
     setPendingFiles((prev) => prev.filter((_, index) => index !== fileIndexToRemove));
-    toast.info('File removed from comment draft.');
+    toast.info(gt('File removed from comment draft.'));
   };
 
   const handleCommentSubmit = async () => {
@@ -92,7 +94,7 @@ export function CommentForm({ entityId, entityType }: CommentFormProps) {
       // Use direct API call instead of server action
       await createCommentWithFiles(newComment, entityId, entityType, pendingFiles);
 
-      toast.success('Comment added!');
+      toast.success(gt('Comment added!'));
 
       // Refresh comments via SWR
       refreshComments();
@@ -102,7 +104,7 @@ export function CommentForm({ entityId, entityType }: CommentFormProps) {
       setPendingFiles([]);
     } catch (error) {
       console.error('Error creating comment:', error);
-      toast.error(error instanceof Error ? error.message : 'Failed to add comment');
+      toast.error(error instanceof Error ? error.message : gt('Failed to add comment'));
     } finally {
       setIsSubmitting(false);
     }
@@ -135,7 +137,7 @@ export function CommentForm({ entityId, entityType }: CommentFormProps) {
         />
         <div className="flex-1 space-y-3">
           <Textarea
-            placeholder="Leave a comment..."
+            placeholder={gt('Leave a comment...')}
             className="resize-none border-0 bg-transparent p-4 placeholder:text-muted-foreground focus-visible:ring-0 focus-visible:ring-offset-0"
             value={newComment}
             onChange={(e: { target: { value: React.SetStateAction<string> } }) =>
@@ -162,7 +164,7 @@ export function CommentForm({ entityId, entityType }: CommentFormProps) {
                       onClick={() => handleRemovePendingFile(index)}
                       disabled={isSubmitting}
                       className="text-muted-foreground hover:text-destructive transition-colors shrink-0"
-                      aria-label={`Remove ${file.name}`}
+                      aria-label={gt('Remove {fileName}', { fileName: file.name })}
                     >
                       <X className="h-3 w-3" />
                     </button>
@@ -179,7 +181,7 @@ export function CommentForm({ entityId, entityType }: CommentFormProps) {
               className="text-muted-foreground hover:text-foreground h-8 w-8"
               onClick={triggerFileInput}
               disabled={isSubmitting}
-              aria-label="Add attachment"
+              aria-label={gt('Add attachment')}
             >
               <Paperclip className="h-4 w-4" />
             </Button>
@@ -188,10 +190,10 @@ export function CommentForm({ entityId, entityType }: CommentFormProps) {
               size="sm"
               onClick={handleCommentSubmit}
               disabled={isSubmitting || (!newComment.trim() && pendingFiles.length === 0)}
-              aria-label="Submit comment"
+              aria-label={gt('Submit comment')}
               className="h-8 px-3 bg-primary text-primary-foreground hover:bg-primary/90"
             >
-              {isSubmitting ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : 'Comment'}
+              {isSubmitting ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : gt('Comment')}
             </Button>
           </div>
         </div>
@@ -204,21 +206,27 @@ export function CommentForm({ entityId, entityType }: CommentFormProps) {
               <div className="rounded-full bg-primary/10 p-2">
                 <Camera className="h-5 w-5 text-primary" />
               </div>
-              <DialogTitle>Screenshot Requirements</DialogTitle>
+              <T>
+                <DialogTitle>Screenshot Requirements</DialogTitle>
+              </T>
             </div>
-            <DialogDescription className="pt-2">
-              Ensure your organisation name is clearly visible within the screenshot.
-            </DialogDescription>
+            <T>
+              <DialogDescription className="pt-2">
+                Ensure your organisation name is clearly visible within the screenshot.
+              </DialogDescription>
+            </T>
           </DialogHeader>
-          <p className="text-sm text-muted-foreground">
-            Auditors require this to verify the source of the data; without it, evidence may be
-            rejected.
-          </p>
+          <T>
+            <p className="text-sm text-muted-foreground">
+              Auditors require this to verify the source of the data; without it, evidence may be
+              rejected.
+            </p>
+          </T>
           <DialogFooter>
             <Button variant="outline" onClick={handleReminderClose}>
-              Cancel
+              {gt('Cancel')}
             </Button>
-            <Button onClick={handleReminderConfirm}>Continue</Button>
+            <Button onClick={handleReminderConfirm}>{gt('Continue')}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

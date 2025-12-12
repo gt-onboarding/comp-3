@@ -1,6 +1,7 @@
 'use client';
 
 import type { ColumnSort, SortDirection, Table } from '@tanstack/react-table';
+import { useGT, useMessages } from 'gt-next';
 import { ArrowDownUp, ChevronsUpDown, GripVertical, Trash2 } from 'lucide-react';
 import { useQueryState } from 'nuqs';
 import * as React from 'react';
@@ -45,6 +46,8 @@ export function DataTableSortList<TData>({
   const descriptionId = React.useId();
   const [open, setOpen] = React.useState(false);
   const addButtonRef = React.useRef<HTMLButtonElement>(null);
+  const gt = useGT();
+  const m = useMessages();
 
   const sortParam = tableId ? `${tableId}_sort` : 'sort';
   const [urlSorting, setUrlSorting] = useQueryState(sortParam);
@@ -243,7 +246,7 @@ export function DataTableSortList<TData>({
             className="items-center gap-1.5"
           >
             <ArrowDownUp className="hidden size-4 md:block" />
-            Sort
+            {gt('Sort')}
             {sorting.length > 0 && (
               <Badge
                 variant="secondary"
@@ -262,15 +265,15 @@ export function DataTableSortList<TData>({
         >
           <div className="relative flex flex-col gap-1">
             <h4 id={labelId} className="leading-none font-medium">
-              {sorting.length > 0 ? 'Sort by' : 'No sorting applied'}
+              {sorting.length > 0 ? gt('Sort by') : gt('No sorting applied')}
             </h4>
             <p
               id={descriptionId}
               className={cn('text-muted-foreground text-sm', sorting.length > 0 && 'sr-only')}
             >
               {sorting.length > 0
-                ? 'Modify sorting to organize your rows.'
-                : 'Add sorting to organize your rows.'}
+                ? gt('Modify sorting to organize your rows.')
+                : gt('Add sorting to organize your rows.')}
             </p>
           </div>
           {sorting.length > 0 && (
@@ -297,11 +300,11 @@ export function DataTableSortList<TData>({
               onClick={onSortAdd}
               disabled={columns.length === 0}
             >
-              Add sort
+              {gt('Add sort')}
             </Button>
             {sorting.length > 0 && (
               <Button variant="outline" size="sm" onClick={onSortingReset}>
-                Reset sorting
+                {gt('Reset sorting')}
               </Button>
             )}
           </div>
@@ -342,6 +345,8 @@ function DataTableSortItem({
 
   const [showFieldSelector, setShowFieldSelector] = React.useState(false);
   const [showDirectionSelector, setShowDirectionSelector] = React.useState(false);
+  const gt = useGT();
+  const m = useMessages();
 
   const onItemKeyDown = React.useCallback(
     (event: React.KeyboardEvent<HTMLDivElement>) => {
@@ -379,7 +384,7 @@ function DataTableSortItem({
               className="w-44 justify-between font-normal"
             >
               <span className="truncate">
-                {columnLabels.get(sort.id) || sort.id || 'Unknown column'}
+                {columnLabels.get(sort.id) || sort.id || gt('Unknown column')}
               </span>
               <ChevronsUpDown className="opacity-50" />
             </Button>
@@ -389,9 +394,9 @@ function DataTableSortItem({
             className="w-[var(--radix-popover-trigger-width)] origin-[var(--radix-popover-content-transform-origin)] p-0"
           >
             <Command>
-              <CommandInput placeholder="Search fields..." />
+              <CommandInput placeholder={gt('Search fields...')} />
               <CommandList>
-                <CommandEmpty>No fields found.</CommandEmpty>
+                <CommandEmpty>{gt('No fields found.')}</CommandEmpty>
                 <CommandGroup>
                   {columns.map((column) => (
                     <CommandItem
@@ -428,7 +433,7 @@ function DataTableSortItem({
           >
             {dataTableConfig.sortOrders.map((order) => (
               <SelectItem key={order.value} value={order.value}>
-                {order.label}
+                {m(order.label)}
               </SelectItem>
             ))}
           </SelectContent>

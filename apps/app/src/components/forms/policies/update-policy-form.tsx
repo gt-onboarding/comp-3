@@ -9,6 +9,7 @@ import { Input } from '@comp/ui/input';
 import { Textarea } from '@comp/ui/textarea';
 import { Policy } from '@db';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useGT } from 'gt-next';
 import { Loader2 } from 'lucide-react';
 import { useAction } from 'next-safe-action/hooks';
 import { useQueryState } from 'nuqs';
@@ -17,15 +18,16 @@ import { toast } from 'sonner';
 import type { z } from 'zod';
 
 export function UpdatePolicyForm({ policy }: { policy: Policy }) {
+  const gt = useGT();
   const [open, setOpen] = useQueryState('policy-overview-sheet');
 
   const updatePolicy = useAction(updatePolicyOverviewAction, {
     onSuccess: () => {
-      toast.success('Policy updated successfully');
+      toast.success(gt('Policy updated successfully'));
       setOpen(null);
     },
     onError: () => {
-      toast.error('Failed to update policy');
+      toast.error(gt('Failed to update policy'));
     },
   });
 
@@ -54,7 +56,7 @@ export function UpdatePolicyForm({ policy }: { policy: Policy }) {
       <div className="scrollbar-hide h-[calc(100vh-250px)] overflow-auto">
         <Accordion type="multiple" defaultValue={['policy']}>
           <AccordionItem value="policy">
-            <AccordionTrigger>{'Policy'}</AccordionTrigger>
+            <AccordionTrigger>{gt('Policy')}</AccordionTrigger>
             <AccordionContent>
               <form onSubmit={form.handleSubmit(onSubmit)}>
                 <div className="space-y-4">
@@ -63,13 +65,13 @@ export function UpdatePolicyForm({ policy }: { policy: Policy }) {
                     name="title"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>{'Policy Title'}</FormLabel>
+                        <FormLabel>{gt('Policy Title')}</FormLabel>
                         <FormControl>
                           <Input
                             {...field}
                             autoFocus
                             className="mt-3"
-                            placeholder={'Policy Title'}
+                            placeholder={gt('Policy Title')}
                             autoCorrect="off"
                           />
                         </FormControl>
@@ -82,12 +84,12 @@ export function UpdatePolicyForm({ policy }: { policy: Policy }) {
                     name="description"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Description</FormLabel>
+                        <FormLabel>{gt('Description')}</FormLabel>
                         <FormControl>
                           <Textarea
                             {...field}
                             className="mt-3 min-h-[80px]"
-                            placeholder={"A brief summary of the policy's purpose."}
+                            placeholder={gt("A brief summary of the policy's purpose.")}
                           />
                         </FormControl>
                         <FormMessage />
@@ -104,7 +106,7 @@ export function UpdatePolicyForm({ policy }: { policy: Policy }) {
                     {updatePolicy.status === 'executing' ? (
                       <Loader2 className="h-4 w-4 animate-spin" />
                     ) : (
-                      'Save'
+                      gt('Save')
                     )}
                   </Button>
                 </div>

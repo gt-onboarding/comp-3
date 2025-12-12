@@ -1,6 +1,7 @@
 'use client';
 
 import { Editor, type JSONContent } from '@comp/ui/editor';
+import { useGT } from 'gt-next';
 
 interface AdvancedEditorProps {
   initialContent?: JSONContent | JSONContent[];
@@ -17,17 +18,20 @@ const AdvancedEditor = ({
   onUpdate,
   onSave,
   readOnly = false,
-  placeholder = 'Start writing...',
+  placeholder,
   className,
   saveDebounceMs = 500,
 }: AdvancedEditorProps) => {
+  const gt = useGT();
+  const defaultPlaceholder = gt('Start writing...');
+
   return (
     <Editor
       initialContent={initialContent}
       onUpdate={onUpdate}
       onSave={onSave}
       readOnly={readOnly}
-      placeholder={placeholder}
+      placeholder={placeholder ?? defaultPlaceholder}
       className={className}
       saveDebounceMs={saveDebounceMs}
       showSaveStatus={true}

@@ -21,6 +21,7 @@ import MultipleSelector from '@comp/ui/multiple-selector';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@comp/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@comp/ui/tabs';
 import { Key, Loader2, Settings, Trash2, Unplug } from 'lucide-react';
+import { useGT } from 'gt-next';
 import Image from 'next/image';
 import { useParams } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -100,6 +101,7 @@ export function ManageIntegrationDialog({
   onDeleted,
   onSaved,
 }: ManageIntegrationDialogProps) {
+  const gt = useGT();
   const { orgId } = useParams<{ orgId: string }>();
   const { disconnectConnection, deleteConnection } = useIntegrationMutations();
   const { refresh: refreshConnections } = useIntegrationConnections();
@@ -175,7 +177,7 @@ export function ManageIntegrationDialog({
         setVariableValues(values);
       }
     } catch {
-      toast.error('Failed to load configuration');
+      toast.error(gt('Failed to load configuration'));
     } finally {
       setLoadingVariables(false);
     }
@@ -203,7 +205,7 @@ export function ManageIntegrationDialog({
           setDynamicOptions((prev) => ({ ...prev, [variableId]: response.data!.options }));
         }
       } catch {
-        toast.error('Failed to load options');
+        toast.error(gt('Failed to load options'));
       } finally {
         setLoadingDynamicOptions((prev) => ({ ...prev, [variableId]: false }));
       }
@@ -220,11 +222,11 @@ export function ManageIntegrationDialog({
         `/v1/integrations/variables/connections/${connectionId}?organizationId=${orgId}`,
         { variables: variableValues },
       );
-      toast.success('Configuration saved');
+      toast.success(gt('Configuration saved'));
       refreshConnections();
       onSaved?.();
     } catch {
-      toast.error('Failed to save configuration');
+      toast.error(gt('Failed to save configuration'));
     } finally {
       setSavingVariables(false);
     }
@@ -236,7 +238,7 @@ export function ManageIntegrationDialog({
     // Check if any credentials were actually entered
     const hasValues = Object.values(credentialValues).some((v) => v.trim() !== '');
     if (!hasValues) {
-      toast.error('Please enter at least one credential value to update');
+      toast.error(gt('Please enter at least one credential value to update'));
       return;
     }
 
@@ -254,7 +256,7 @@ export function ManageIntegrationDialog({
         `/v1/integrations/connections/${connectionId}/credentials?organizationId=${orgId}`,
         { credentials: credentialsToSave },
       );
-      toast.success('Credentials updated');
+      toast.success(gt('Credentials updated'));
       refreshConnections();
       // Clear the form
       setCredentialValues((prev) => {
@@ -266,7 +268,7 @@ export function ManageIntegrationDialog({
       });
       onSaved?.();
     } catch {
-      toast.error('Failed to update credentials');
+      toast.error(gt('Failed to update credentials'));
     } finally {
       setSavingCredentials(false);
     }
@@ -279,15 +281,15 @@ export function ManageIntegrationDialog({
     try {
       const result = await disconnectConnection(connectionId);
       if (result.success) {
-        toast.success('Integration disconnected');
+        toast.success(gt('Integration disconnected'));
         onOpenChange(false);
         refreshConnections();
         onDisconnected?.();
       } else {
-        toast.error(result.error || 'Failed to disconnect');
+        toast.error(result.error || gt('Failed to disconnect'));
       }
     } catch {
-      toast.error('Failed to disconnect');
+      toast.error(gt('Failed to disconnect'));
     } finally {
       setDisconnecting(false);
     }
@@ -300,15 +302,15 @@ export function ManageIntegrationDialog({
     try {
       const result = await deleteConnection(connectionId);
       if (result.success) {
-        toast.success('Integration removed');
+        toast.success(gt('Integration removed'));
         onOpenChange(false);
         refreshConnections();
         onDeleted?.();
       } else {
-        toast.error(result.error || 'Failed to remove');
+        toast.error(result.error || gt('Failed to remove'));
       }
     } catch {
-      toast.error('Failed to remove');
+      toast.error(gt('Failed to remove'));
     } finally {
       setDeleting(false);
     }
@@ -337,16 +339,16 @@ export function ManageIntegrationDialog({
               />
             </div>
             {checkContext
-              ? `Configure ${checkContext.checkName}`
+              ? gt('Configure {name}', { name: checkContext.checkName })
               : configureOnly
-                ? `Configure ${integrationName}`
-                : `Manage ${integrationName}`}
+                ? gt('Configure {name}', { name: integrationName })
+                : gt('Manage {name}', { name: integrationName })}
           </DialogTitle>
           <DialogDescription>
             {checkContext?.checkDescription ||
               (configureOnly
-                ? 'Set up your integration to start automated checks.'
-                : 'Configure your integration settings or disconnect.')}
+                ? gt('Set up your integration to start automated checks.')
+                : gt('Configure your integration settings or disconnect.'))}
           </DialogDescription>
         </DialogHeader>
 
@@ -386,12 +388,12 @@ export function ManageIntegrationDialog({
               {disconnecting ? (
                 <>
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Disconnecting...
+                  {gt('Disconnecting...')}
                 </>
               ) : (
                 <>
                   <Unplug className="h-4 w-4 mr-2" />
-                  Disconnect
+                  {gt('Disconnect')}
                 </>
               )}
             </Button>
@@ -404,12 +406,12 @@ export function ManageIntegrationDialog({
               {deleting ? (
                 <>
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Removing...
+                  {gt('Removing...')}
                 </>
               ) : (
                 <>
                   <Trash2 className="h-4 w-4 mr-2" />
-                  Remove
+                  {gt('Remove')}
                 </>
               )}
             </Button>
@@ -458,6 +460,7 @@ function ConfigurationContent({
   activeTab: 'variables' | 'credentials';
   setActiveTab: (tab: 'variables' | 'credentials') => void;
 }) {
+  const gt = useGT();
   const hasVariables = variables.length > 0;
   const hasCredentials = authStrategy === 'custom' && credentialFields.length > 0;
   const showTabs = hasVariables && hasCredentials;
@@ -466,14 +469,14 @@ function ConfigurationContent({
   if (!hasVariables && !hasCredentials) {
     return (
       <p className="text-sm text-muted-foreground text-center py-4">
-        This integration is fully configured and ready to use.
+        {gt('This integration is fully configured and ready to use.')}
       </p>
     );
   }
 
   const variablesContent = hasVariables && (
     <div className="space-y-4">
-      {!showTabs && <h4 className="text-sm font-medium">Configuration</h4>}
+      {!showTabs && <h4 className="text-sm font-medium">{gt('Configuration')}</h4>}
       {variables.map((variable) => {
         const options = dynamicOptions[variable.id] || variable.options || [];
         const isLoadingOptions = loadingDynamicOptions[variable.id];
@@ -491,7 +494,7 @@ function ConfigurationContent({
               <p className="text-xs text-muted-foreground">{variable.helpText}</p>
             )}
             {variable.placeholder && !variable.description && !variable.helpText && (
-              <p className="text-xs text-muted-foreground">Example: {variable.placeholder}</p>
+              <p className="text-xs text-muted-foreground">{gt('Example: {placeholder}', { placeholder: variable.placeholder })}</p>
             )}
 
             {variable.type === 'multi-select' ? (
@@ -521,17 +524,17 @@ function ConfigurationContent({
                 }}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder={`Select ${variable.label.toLowerCase()}`} />
+                  <SelectValue placeholder={gt('Select {label}', { label: variable.label.toLowerCase() })} />
                 </SelectTrigger>
                 <SelectContent>
                   {isLoadingOptions ? (
                     <div className="py-2 px-3 text-sm text-muted-foreground flex items-center gap-2">
                       <Loader2 className="h-3 w-3 animate-spin" />
-                      Loading options...
+                      {gt('Loading options...')}
                     </div>
                   ) : options.length === 0 ? (
                     <div className="py-2 px-3 text-sm text-muted-foreground">
-                      No options available
+                      {gt('No options available')}
                     </div>
                   ) : (
                     options.map((opt) => (
@@ -556,8 +559,8 @@ function ConfigurationContent({
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="true">Yes</SelectItem>
-                  <SelectItem value="false">No</SelectItem>
+                  <SelectItem value="true">{gt('Yes')}</SelectItem>
+                  <SelectItem value="false">{gt('No')}</SelectItem>
                 </SelectContent>
               </Select>
             ) : (
@@ -572,7 +575,7 @@ function ConfigurationContent({
                       variable.type === 'number' ? Number(e.target.value) : e.target.value,
                   }))
                 }
-                placeholder={`Enter ${variable.label.toLowerCase()}`}
+                placeholder={gt('Enter {label}', { label: variable.label.toLowerCase() })}
               />
             )}
           </div>
@@ -583,10 +586,10 @@ function ConfigurationContent({
         {savingVariables ? (
           <>
             <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-            Saving...
+            {gt('Saving...')}
           </>
         ) : (
-          'Save Configuration'
+          gt('Save Configuration')
         )}
       </Button>
     </div>
@@ -594,10 +597,10 @@ function ConfigurationContent({
 
   const credentialsContent = hasCredentials && (
     <div className="space-y-4">
-      {!showTabs && <h4 className="text-sm font-medium">Update Credentials</h4>}
+      {!showTabs && <h4 className="text-sm font-medium">{gt('Update Credentials')}</h4>}
       <div className="rounded-md bg-muted/50 border border-border p-3 space-y-1">
         <p className="text-xs text-muted-foreground">
-          Leave fields empty to keep existing values. Only fill in fields you want to update.
+          {gt('Leave fields empty to keep existing values. Only fill in fields you want to update.')}
         </p>
         <p className="text-xs text-muted-foreground flex items-center gap-1.5">
           <svg
@@ -612,20 +615,20 @@ function ConfigurationContent({
               clipRule="evenodd"
             />
           </svg>
-          <span>Your credentials are encrypted at rest using AES-256-GCM encryption.</span>
+          <span>{gt('Your credentials are encrypted at rest using AES-256-GCM encryption.')}</span>
         </p>
       </div>
       {credentialFields.map((field) => (
         <div key={field.id} className="space-y-2">
           <Label htmlFor={`cred-${field.id}`}>
             {field.label}
-            {field.required && <span className="text-muted-foreground ml-1">(required)</span>}
+            {field.required && <span className="text-muted-foreground ml-1">{gt('(required)')}</span>}
           </Label>
           {field.helpText && <p className="text-xs text-muted-foreground">{field.helpText}</p>}
           {field.type === 'textarea' ? (
             <textarea
               id={`cred-${field.id}`}
-              placeholder={field.placeholder || `Enter new ${field.label.toLowerCase()}`}
+              placeholder={field.placeholder || gt('Enter new {label}', { label: field.label.toLowerCase() })}
               value={credentialValues[field.id] || ''}
               onChange={(e) =>
                 setCredentialValues((prev) => ({ ...prev, [field.id]: e.target.value }))
@@ -645,11 +648,11 @@ function ConfigurationContent({
               onCreate={(customValue) =>
                 setCredentialValues((prev) => ({ ...prev, [field.id]: customValue }))
               }
-              placeholder={field.placeholder || `Select ${field.label.toLowerCase()}...`}
-              searchPlaceholder="Search or type custom value..."
+              placeholder={field.placeholder || gt('Select {label}...', { label: field.label.toLowerCase() })}
+              searchPlaceholder={gt('Search or type custom value...')}
               renderOnCreate={(customValue) => (
                 <div className="flex items-center gap-2">
-                  <span className="text-sm">Use custom value:</span>
+                  <span className="text-sm">{gt('Use custom value:')}</span>
                   <span className="font-medium">{customValue}</span>
                 </div>
               )}
@@ -660,7 +663,7 @@ function ConfigurationContent({
               onValueChange={(val) => setCredentialValues((prev) => ({ ...prev, [field.id]: val }))}
             >
               <SelectTrigger>
-                <SelectValue placeholder={`Select ${field.label.toLowerCase()}`} />
+                <SelectValue placeholder={gt('Select {label}', { label: field.label.toLowerCase() })} />
               </SelectTrigger>
               <SelectContent>
                 {field.options.map((opt) => (
@@ -674,7 +677,7 @@ function ConfigurationContent({
             <Input
               id={`cred-${field.id}`}
               type={field.type === 'password' ? 'password' : 'text'}
-              placeholder={field.placeholder || `Enter new ${field.label.toLowerCase()}`}
+              placeholder={field.placeholder || gt('Enter new {label}', { label: field.label.toLowerCase() })}
               value={credentialValues[field.id] || ''}
               onChange={(e) =>
                 setCredentialValues((prev) => ({ ...prev, [field.id]: e.target.value }))
@@ -688,10 +691,10 @@ function ConfigurationContent({
         {savingCredentials ? (
           <>
             <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-            Updating...
+            {gt('Updating...')}
           </>
         ) : (
-          'Update Credentials'
+          gt('Update Credentials')
         )}
       </Button>
     </div>
@@ -704,11 +707,11 @@ function ConfigurationContent({
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="variables" className="gap-2">
             <Settings className="h-4 w-4" />
-            Settings
+            {gt('Settings')}
           </TabsTrigger>
           <TabsTrigger value="credentials" className="gap-2">
             <Key className="h-4 w-4" />
-            Credentials
+            {gt('Credentials')}
           </TabsTrigger>
         </TabsList>
         <TabsContent value="variables" className="mt-4">
@@ -741,6 +744,7 @@ function MultiSelectVariable({
   onChange: (val: string[]) => void;
   onLoadOptions: () => void;
 }) {
+  const gt = useGT();
   const selectedValues = Array.isArray(value) ? value : [];
   const hasLoadedRef = useRef(false);
 
@@ -765,15 +769,15 @@ function MultiSelectVariable({
       onChange={(selected) => onChange(selected.map((s) => s.value))}
       defaultOptions={options.map((o) => ({ value: o.value, label: o.label }))}
       options={options.map((o) => ({ value: o.value, label: o.label }))}
-      placeholder={`Select ${variable.label.toLowerCase()}...`}
+      placeholder={gt('Select {label}...', { label: variable.label.toLowerCase() })}
       emptyIndicator={
         isLoadingOptions ? (
           <div className="py-2 px-3 text-sm text-muted-foreground flex items-center gap-2">
             <Loader2 className="h-3 w-3 animate-spin" />
-            Loading options...
+            {gt('Loading options...')}
           </div>
         ) : (
-          <p className="text-center text-sm text-muted-foreground">No options available</p>
+          <p className="text-center text-sm text-muted-foreground">{gt('No options available')}</p>
         )
       }
     />

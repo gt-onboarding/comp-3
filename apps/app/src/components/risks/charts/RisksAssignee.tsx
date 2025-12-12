@@ -7,6 +7,8 @@ import { db } from '@db';
 import { headers } from 'next/headers';
 import Link from 'next/link';
 import { cache } from 'react';
+import { msg } from 'gt-next';
+import { getGT, getMessages } from 'gt-next/server';
 
 interface UserRiskStats {
   user: {
@@ -29,7 +31,17 @@ const riskStatusColors = {
   archived: 'bg-gray-500',
 };
 
+const unknownUserLabel = msg('Unknown User');
+const statusLabels = {
+  open: msg('Open'),
+  pending: msg('Pending'),
+  closed: msg('Closed'),
+  archived: msg('Archived'),
+};
+
 export async function RisksAssignee() {
+  const gt = await getGT();
+  const m = await getMessages();
   const userStats = await userData();
   const session = await auth.api.getSession({
     headers: await headers(),
@@ -56,7 +68,7 @@ export async function RisksAssignee() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>{'Risks by Assignee'}</CardTitle>
+        <CardTitle>{gt('Risks by Assignee')}</CardTitle>
       </CardHeader>
       <CardContent>
         <ScrollArea>
@@ -67,17 +79,17 @@ export async function RisksAssignee() {
                   <Avatar>
                     <AvatarImage src={stat.user.image || undefined} />
                     <AvatarFallback>
-                      {getInitials(stat.user.name || stat.user.email || 'Unknown User')}
+                      {getInitials(stat.user.name || stat.user.email || m(unknownUserLabel))}
                     </AvatarFallback>
                   </Avatar>
 
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center justify-between">
                       <p className="truncate text-sm leading-none font-medium">
-                        {stat.user.name || stat.user.email || 'Unknown User'}
+                        {stat.user.name || stat.user.email || m(unknownUserLabel)}
                       </p>
                       <span className="text-muted-foreground text-sm">
-                        {stat.totalRisks} {'risks'}
+                        {stat.totalRisks} {gt('risks')}
                       </span>
                     </div>
 
@@ -90,7 +102,7 @@ export async function RisksAssignee() {
                               style={{
                                 width: `${(stat.openRisks / stat.totalRisks) * 100}%`,
                               }}
-                              title={`${'Open'}: ${stat.openRisks}`}
+                              title={`${m(statusLabels.open)}: ${stat.openRisks}`}
                             />
                           )}
                           {stat.pendingRisks > 0 && (
@@ -99,7 +111,7 @@ export async function RisksAssignee() {
                               style={{
                                 width: `${(stat.pendingRisks / stat.totalRisks) * 100}%`,
                               }}
-                              title={`${'Pending'}: ${stat.pendingRisks}`}
+                              title={`${m(statusLabels.pending)}: ${stat.pendingRisks}`}
                             />
                           )}
                           {stat.closedRisks > 0 && (
@@ -108,7 +120,7 @@ export async function RisksAssignee() {
                               style={{
                                 width: `${(stat.closedRisks / stat.totalRisks) * 100}%`,
                               }}
-                              title={`${'Closed'}: ${stat.closedRisks}`}
+                              title={`${m(statusLabels.closed)}: ${stat.closedRisks}`}
                             />
                           )}
                           {stat.archivedRisks > 0 && (
@@ -117,7 +129,7 @@ export async function RisksAssignee() {
                               style={{
                                 width: `${(stat.archivedRisks / stat.totalRisks) * 100}%`,
                               }}
-                              title={`${'Archived'}: ${stat.archivedRisks}`}
+                              title={`${m(statusLabels.archived)}: ${stat.archivedRisks}`}
                             />
                           )}
                         </div>
@@ -129,7 +141,7 @@ export async function RisksAssignee() {
                         <div className="flex items-center gap-1">
                           <div className={`size-2 rounded-full ${riskStatusColors.open}`} />
                           <span>
-                            {'Open'} ({stat.openRisks})
+                            {m(statusLabels.open)} ({stat.openRisks})
                           </span>
                         </div>
                       )}
@@ -137,7 +149,7 @@ export async function RisksAssignee() {
                         <div className="flex items-center gap-1">
                           <div className={`size-2 rounded-full ${riskStatusColors.pending}`} />
                           <span>
-                            {'Pending'} ({stat.pendingRisks})
+                            {m(statusLabels.pending)} ({stat.pendingRisks})
                           </span>
                         </div>
                       )}
@@ -145,7 +157,7 @@ export async function RisksAssignee() {
                         <div className="flex items-center gap-1">
                           <div className={`size-2 rounded-full ${riskStatusColors.closed}`} />
                           <span>
-                            {'Closed'} ({stat.closedRisks})
+                            {m(statusLabels.closed)} ({stat.closedRisks})
                           </span>
                         </div>
                       )}
@@ -153,7 +165,7 @@ export async function RisksAssignee() {
                         <div className="flex items-center gap-1">
                           <div className={`size-2 rounded-full ${riskStatusColors.archived}`} />
                           <span>
-                            {'Archived'} ({stat.archivedRisks})
+                            {m(statusLabels.archived)} ({stat.archivedRisks})
                           </span>
                         </div>
                       )}

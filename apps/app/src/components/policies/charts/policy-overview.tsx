@@ -8,6 +8,7 @@ import {
   ChartTooltipContent,
 } from '@comp/ui/chart';
 import { Cell, Pie, PieChart } from 'recharts';
+import { T, useGT } from 'gt-next';
 
 interface PolicyOverviewProps {
   data: {
@@ -19,17 +20,18 @@ interface PolicyOverviewProps {
 }
 
 export function PolicyOverview({ data }: PolicyOverviewProps) {
+  const gt = useGT();
   const config: ChartConfig = {
     draft: {
-      label: 'Draft',
+      label: gt('Draft'),
       color: 'hsl(var(--chart-1))',
     },
     published: {
-      label: 'Published',
+      label: gt('Published'),
       color: 'hsl(var(--chart-2))',
     },
     review: {
-      label: 'Needs Review',
+      label: gt('Needs Review'),
       color: 'hsl(var(--chart-3))',
     },
   };
@@ -56,10 +58,12 @@ export function PolicyOverview({ data }: PolicyOverviewProps) {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>{'Policy by Status'}</CardTitle>
+          <T>
+            <CardTitle>Policy by Status</CardTitle>
+          </T>
         </CardHeader>
         <CardContent className="text-muted-foreground flex h-[300px] items-center justify-center">
-          No data
+          <T>No data</T>
         </CardContent>
       </Card>
     );
@@ -68,7 +72,9 @@ export function PolicyOverview({ data }: PolicyOverviewProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>{'Policy by Status'}</CardTitle>
+        <T>
+          <CardTitle>Policy by Status</CardTitle>
+        </T>
       </CardHeader>
       <CardContent>
         <ChartContainer config={config}>
