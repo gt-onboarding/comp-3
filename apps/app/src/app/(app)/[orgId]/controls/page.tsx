@@ -2,6 +2,7 @@ import PageWithBreadcrumb from '@/components/pages/PageWithBreadcrumb';
 import { getValidFilters } from '@/lib/data-table';
 import { auth } from '@/utils/auth';
 import { db } from '@db';
+import { getGT } from 'gt-next/server';
 import { Metadata } from 'next';
 import { headers } from 'next/headers';
 import { SearchParams } from 'nuqs';
@@ -14,8 +15,9 @@ interface ControlTableProps {
 }
 
 export async function generateMetadata(): Promise<Metadata> {
+  const gt = await getGT();
   return {
-    title: 'Controls',
+    title: gt('Controls'),
   };
 }
 
@@ -34,9 +36,10 @@ export default async function ControlsPage({ ...props }: ControlTableProps) {
   const policies = await getPolicies();
   const tasks = await getTasks();
   const requirements = await getRequirements();
+  const gt = await getGT();
 
   return (
-    <PageWithBreadcrumb breadcrumbs={[{ label: 'Controls', current: true }]}>
+    <PageWithBreadcrumb breadcrumbs={[{ label: gt('Controls'), current: true }]}>
       <ControlsTable
         promises={promises}
         policies={policies}

@@ -9,6 +9,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@comp/ui/dialog';
+import { useMessages } from 'gt-next';
 
 interface ConfirmActionDialogProps {
   isOpen: boolean;
@@ -33,6 +34,7 @@ export function ConfirmActionDialog({
   variant = 'default',
   isLoading = false,
 }: ConfirmActionDialogProps) {
+  const m = useMessages();
   const handleConfirm = () => {
     onConfirm();
     onClose();
@@ -42,15 +44,15 @@ export function ConfirmActionDialog({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{title}</DialogTitle>
-          <DialogDescription>{description}</DialogDescription>
+          <DialogTitle>{m(title)}</DialogTitle>
+          <DialogDescription>{m(description)}</DialogDescription>
         </DialogHeader>
         <DialogFooter>
           <Button variant="outline" onClick={onClose} disabled={isLoading}>
-            {cancelText}
+            {m(cancelText)}
           </Button>
           <Button variant={variant} onClick={handleConfirm} disabled={isLoading}>
-            {isLoading ? 'Loading...' : confirmText}
+            {isLoading ? m('Loading...') : m(confirmText)}
           </Button>
         </DialogFooter>
       </DialogContent>

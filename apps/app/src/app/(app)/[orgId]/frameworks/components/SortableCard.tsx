@@ -3,6 +3,7 @@
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { GripVertical } from 'lucide-react';
+import { useGT } from 'gt-next';
 
 interface SortableCardProps {
   id: string;
@@ -10,6 +11,7 @@ interface SortableCardProps {
 }
 
 export function SortableCard({ id, children }: SortableCardProps) {
+  const gt = useGT();
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id,
   });
@@ -31,7 +33,7 @@ export function SortableCard({ id, children }: SortableCardProps) {
         {...attributes}
         {...listeners}
         className="absolute -top-2 -left-2 z-10 opacity-0 group-hover:opacity-100 transition-all duration-200 cursor-grab active:cursor-grabbing bg-background border border-muted rounded-xs p-1 hover:bg-muted/50 shadow-sm hover:scale-110"
-        title="Drag to reorder"
+        title={gt('Drag to reorder')}
       >
         <GripVertical className="h-3 w-3 text-muted-foreground" />
       </div>

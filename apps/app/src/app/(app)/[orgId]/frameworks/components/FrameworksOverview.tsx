@@ -5,6 +5,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@comp/ui/c
 import { Dialog } from '@comp/ui/dialog';
 import { ScrollArea } from '@comp/ui/scroll-area';
 import type { FrameworkEditorFramework } from '@db';
+import { useGT } from 'gt-next';
 import { PlusIcon } from 'lucide-react';
 import Image from 'next/image';
 import { useState } from 'react';
@@ -61,6 +62,7 @@ export function FrameworksOverview({
   allFrameworks,
   organizationId,
 }: FrameworksOverviewProps) {
+  const gt = useGT();
   const [isAddFrameworkModalOpen, setIsAddFrameworkModalOpen] = useState(false);
 
   // Create a map of framework IDs to compliance scores for easy lookup
@@ -84,7 +86,7 @@ export function FrameworksOverview({
     <Card className="flex flex-col overflow-hidden border h-full">
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
-          <CardTitle className="flex items-center gap-2">{'Frameworks'}</CardTitle>
+          <CardTitle className="flex items-center gap-2">{gt('Frameworks')}</CardTitle>
         </div>
 
         <div className="bg-secondary/50 relative mt-2 h-1 w-full overflow-hidden rounded-full">
@@ -143,7 +145,7 @@ export function FrameworksOverview({
                               />
                             </div>
                             <span className="text-xs text-muted-foreground tabular-nums text-right mt-1">
-                              {Math.round(complianceScore)}% compliant
+                              {gt('{score}% compliant', { score: Math.round(complianceScore) })}
                             </span>
                           </div>
                         </div>
@@ -164,7 +166,7 @@ export function FrameworksOverview({
         <div className="flex justify-center w-full">
           <Button variant="outline" onClick={() => setIsAddFrameworkModalOpen(true)}>
             <PlusIcon className="h-4 w-4 mr-2" />
-            Add Framework
+            {gt('Add Framework')}
           </Button>
         </div>
       </CardFooter>

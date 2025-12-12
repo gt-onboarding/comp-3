@@ -5,6 +5,7 @@ import { useIntegrationMutations } from '@/hooks/use-integration-platform';
 import { api } from '@/lib/api-client';
 import { Button } from '@comp/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@comp/ui/tabs';
+import { T, Var, DateTime, useGT } from 'gt-next';
 import { Plus, Settings } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
@@ -66,6 +67,7 @@ const isSupportedProviderId = (id: string): id is SupportedProviderId =>
   SUPPORTED_PROVIDER_IDS.includes(id as SupportedProviderId);
 
 export function TestsLayout({ initialFindings, initialProviders, orgId }: TestsLayoutProps) {
+  const gt = useGT();
   const [showSettings, setShowSettings] = useState(false);
   const [viewingResults, setViewingResults] = useState(true);
   const [isScanning, setIsScanning] = useState(false);
@@ -108,7 +110,7 @@ export function TestsLayout({ initialFindings, initialProviders, orgId }: TestsL
 
   const handleRunScan = async (providerId?: string): Promise<string | null> => {
     if (!orgId) {
-      toast.error('No active organization');
+      toast.error(gt('No active organization'));
       return null;
     }
 
@@ -117,12 +119,12 @@ export function TestsLayout({ initialFindings, initialProviders, orgId }: TestsL
     const targetProvider = connectedProviders.find((p) => p.integrationId === targetProviderId);
 
     if (!targetProvider) {
-      toast.error('No provider selected');
+      toast.error(gt('No provider selected'));
       return null;
     }
 
     setIsScanning(true);
-    toast.message(`Starting ${targetProvider.name} security scan...`);
+    toast.message(gt('Starting {name} security scan...', { name: targetProvider.name }));
 
     try {
       if (targetProvider.isLegacy) {
@@ -137,18 +139,18 @@ export function TestsLayout({ initialFindings, initialProviders, orgId }: TestsL
         const response = await api.post(`/v1/cloud-security/scan/${targetProvider.id}`, {}, orgId);
         if (response.error) {
           console.error(`Error scanning ${targetProvider.name}:`, response.error);
-          toast.error(`Failed to scan ${targetProvider.name}`);
+          toast.error(gt('Failed to scan {name}', { name: targetProvider.name }));
           return null;
         }
       }
 
-      toast.success('Scan completed! Results updated.');
+      toast.success(gt('Scan completed! Results updated.'));
       await mutateProviders(); // Refresh to get updated lastRunAt
       await mutateFindings();
       return 'completed';
     } catch (error) {
       console.error('Scan error:', error);
-      toast.error('Failed to complete scan. Please try again.');
+      toast.error(gt('Failed to complete scan. Please try again.'));
       return null;
     } finally {
       setIsScanning(false);
@@ -192,22 +194,28 @@ export function TestsLayout({ initialFindings, initialProviders, orgId }: TestsL
       <div className="mx-auto max-w-7xl flex w-full flex-col gap-6 py-4 md:py-6 lg:py-8">
         <div className="flex items-center justify-between">
           <div className="space-y-1">
-            <h1 className="text-2xl font-semibold tracking-tight">Cloud Security Tests</h1>
-            <p className="text-muted-foreground text-sm">
-              {provider.name} • {providerFindings.length} findings
-            </p>
-            {provider.lastRunAt && (
-              <p className="text-muted-foreground text-xs">
-                Last scan: {new Date(provider.lastRunAt).toLocaleString()} • Next scan: Daily at
-                5:00 AM UTC
+            <T>
+              <h1 className="text-2xl font-semibold tracking-tight">Cloud Security Tests</h1>
+            </T>
+            <T>
+              <p className="text-muted-foreground text-sm">
+                <Var>{provider.name}</Var> • <Var>{providerFindings.length}</Var> findings
               </p>
+            </T>
+            {provider.lastRunAt && (
+              <T>
+                <p className="text-muted-foreground text-xs">
+                  Last scan: <DateTime>{new Date(provider.lastRunAt)}</DateTime> • Next scan: Daily at
+                  5:00 AM UTC
+                </p>
+              </T>
             )}
           </div>
           <div className="flex items-center gap-3">
             {connectedProviders.length < SUPPORTED_PROVIDER_IDS.length && (
               <Button variant="outline" size="sm" onClick={() => setViewingResults(false)}>
                 <Plus className="mr-2 h-4 w-4" />
-                Add Cloud
+                <T>Add Cloud</T>
               </Button>
             )}
             <Button variant="outline" size="icon" onClick={() => setShowSettings(true)}>
@@ -261,7 +269,7 @@ export function TestsLayout({ initialFindings, initialProviders, orgId }: TestsL
               await mutateProviders();
               // Run scan after saving variables
               if (savedProvider) {
-                toast.message('Configuration saved! Running security scan...');
+                toast.message(gt('Configuration saved! Running security scan...'));
                 await handleRunScan(savedProvider.integrationId);
               }
             }}
@@ -277,21 +285,27 @@ export function TestsLayout({ initialFindings, initialProviders, orgId }: TestsL
     <div className="container mx-auto flex w-full flex-col gap-6 p-4 md:p-6 lg:p-8">
       <div className="flex items-center justify-between">
         <div className="space-y-1">
-          <h1 className="text-2xl font-semibold tracking-tight">Cloud Security Tests</h1>
-          <p className="text-muted-foreground text-sm">
-            {connectedProviders.length} cloud providers connected
-          </p>
-          {connectedProviders.some((p) => p.lastRunAt) && (
-            <p className="text-muted-foreground text-xs">
-              Automated scans run daily at 5:00 AM UTC
+          <T>
+            <h1 className="text-2xl font-semibold tracking-tight">Cloud Security Tests</h1>
+          </T>
+          <T>
+            <p className="text-muted-foreground text-sm">
+              <Var>{connectedProviders.length}</Var> cloud providers connected
             </p>
+          </T>
+          {connectedProviders.some((p) => p.lastRunAt) && (
+            <T>
+              <p className="text-muted-foreground text-xs">
+                Automated scans run daily at 5:00 AM UTC
+              </p>
+            </T>
           )}
         </div>
         <div className="flex items-center gap-3">
           {connectedProviders.length < SUPPORTED_PROVIDER_IDS.length && (
             <Button variant="outline" size="sm" onClick={() => setViewingResults(false)}>
               <Plus className="mr-2 h-4 w-4" />
-              Add Cloud
+              <T>Add Cloud</T>
             </Button>
           )}
           <Button variant="outline" size="icon" onClick={() => setShowSettings(true)}>
@@ -367,7 +381,7 @@ export function TestsLayout({ initialFindings, initialProviders, orgId }: TestsL
             await mutateProviders();
             // Run scan after saving variables
             if (savedProvider) {
-              toast.message('Configuration saved! Running security scan...');
+              toast.message(gt('Configuration saved! Running security scan...'));
               await handleRunScan(savedProvider.integrationId);
             }
           }}

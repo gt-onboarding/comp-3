@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import type { z } from 'zod';
+import { T, useGT, Branch, Var } from 'gt-next';
 
 import { addFrameworksToOrganizationAction } from '@/actions/organization/add-frameworks-to-organization-action';
 import { addFrameworksSchema } from '@/actions/schema';
@@ -32,6 +33,7 @@ type Props = {
 };
 
 export function AddFrameworkModal({ onOpenChange, availableFrameworks, organizationId }: Props) {
+  const gt = useGT();
   const router = useRouter();
 
   const form = useForm<z.infer<typeof addFrameworksSchema>>({
@@ -45,10 +47,11 @@ export function AddFrameworkModal({ onOpenChange, availableFrameworks, organizat
 
   const { execute, isExecuting } = useAction(addFrameworksToOrganizationAction, {
     onSuccess: (data) => {
+      const count = data.data?.frameworksAdded ?? 0;
       toast.success(
-        `Successfully added ${data.data?.frameworksAdded ?? 0} framework${
-          data.data?.frameworksAdded && data.data?.frameworksAdded > 1 ? 's' : ''
-        }`,
+        count === 1
+          ? gt('Successfully added {count} framework', { count })
+          : gt('Successfully added {count} frameworks', { count }),
       );
       onOpenChange(false);
       router.refresh();
@@ -58,9 +61,9 @@ export function AddFrameworkModal({ onOpenChange, availableFrameworks, organizat
         toast.error(error.error.serverError);
       } else if (error.error.validationErrors) {
         const errorMessages = Object.values(error.error.validationErrors).flat().join(', ');
-        toast.error(errorMessages || 'Validation error occurred');
+        toast.error(errorMessages || gt('Validation error occurred'));
       } else {
-        toast.error('Failed to add frameworks');
+        toast.error(gt('Failed to add frameworks'));
       }
     },
   });
@@ -77,12 +80,18 @@ export function AddFrameworkModal({ onOpenChange, availableFrameworks, organizat
   return (
     <DialogContent className="max-w-md">
       <DialogHeader className="space-y-2">
-        <DialogTitle className="text-base font-medium">Add Frameworks</DialogTitle>
-        <DialogDescription className="text-muted-foreground text-sm">
-          {availableFrameworks.length > 0
-            ? 'Select the compliance frameworks to add to your organization.'
-            : 'No new frameworks are available to add at this time.'}
-        </DialogDescription>
+        <T>
+          <DialogTitle className="text-base font-medium">Add Frameworks</DialogTitle>
+        </T>
+        <T>
+          <DialogDescription className="text-muted-foreground text-sm">
+            <Branch
+              branch={(availableFrameworks.length > 0).toString()}
+              true="Select the compliance frameworks to add to your organization."
+              false="No new frameworks are available to add at this time."
+            />
+          </DialogDescription>
+        </T>
       </DialogHeader>
 
       {!isExecuting && availableFrameworks.length > 0 && (
@@ -93,7 +102,9 @@ export function AddFrameworkModal({ onOpenChange, availableFrameworks, organizat
               name="frameworkIds"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-sm font-normal">Available Frameworks</FormLabel>
+                  <T>
+                    <FormLabel className="text-sm font-normal">Available Frameworks</FormLabel>
+                  </T>
                   <FormControl>
                     <div className="max-h-80 space-y-3 overflow-y-auto pr-1">
                       {availableFrameworks
@@ -119,23 +130,38 @@ export function AddFrameworkModal({ onOpenChange, availableFrameworks, organizat
             />
 
             <DialogFooter className="gap-2 border-t pt-4">
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={() => handleOpenChange(false)}
-                disabled={isExecuting}
-              >
-                Cancel
-              </Button>
-              <Button
-                type="submit"
-                size="sm"
-                disabled={isExecuting || form.getValues('frameworkIds').length === 0}
-              >
-                {isExecuting && <Loader2 className="mr-2 h-3 w-3 animate-spin" />}
-                Add Selected
-              </Button>
+              <T>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleOpenChange(false)}
+                  disabled={isExecuting}
+                >
+                  Cancel
+                </Button>
+              </T>
+              <T>
+                <Button
+                  type="submit"
+                  size="sm"
+                  disabled={isExecuting || form.getValues('frameworkIds').length === 0}
+                >
+                  <Branch
+                    branch={isExecuting.toString()}
+                    true={
+                      <>
+                        <Var>
+                          <Loader2 className="mr-2 h-3 w-3 animate-spin" />
+                        </Var>
+                        Add Selected
+                      </>
+                    }
+                  >
+                    Add Selected
+                  </Branch>
+                </Button>
+              </T>
             </DialogFooter>
           </form>
         </Form>
@@ -143,18 +169,22 @@ export function AddFrameworkModal({ onOpenChange, availableFrameworks, organizat
 
       {!isExecuting && availableFrameworks.length === 0 && (
         <div className="py-6 text-center">
-          <div className="text-muted-foreground text-sm">
-            All available frameworks are already enabled in your organization.
-          </div>
+          <T>
+            <div className="text-muted-foreground text-sm">
+              All available frameworks are already enabled in your organization.
+            </div>
+          </T>
           <DialogFooter className="mt-6 border-t pt-4">
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() => handleOpenChange(false)}
-            >
-              Close
-            </Button>
+            <T>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => handleOpenChange(false)}
+              >
+                Close
+              </Button>
+            </T>
           </DialogFooter>
         </div>
       )}
@@ -162,7 +192,9 @@ export function AddFrameworkModal({ onOpenChange, availableFrameworks, organizat
       {isExecuting && (
         <div className="flex items-center justify-center py-8">
           <Loader2 className="text-muted-foreground h-6 w-6 animate-spin" />
-          <span className="text-muted-foreground ml-3 text-sm">Adding frameworks...</span>
+          <T>
+            <span className="text-muted-foreground ml-3 text-sm">Adding frameworks...</span>
+          </T>
         </div>
       )}
     </DialogContent>

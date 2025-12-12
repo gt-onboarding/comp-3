@@ -2,6 +2,7 @@
 
 import { authActionClient } from '@/actions/safe-action';
 import { db } from '@db';
+import { msg } from 'gt-next';
 import { revalidatePath, revalidateTag } from 'next/cache';
 import { z } from 'zod';
 
@@ -27,7 +28,7 @@ export const deleteFrameworkAction = authActionClient
     if (!activeOrganizationId) {
       return {
         success: false,
-        error: 'Not authorized',
+        error: msg('Not authorized'),
       };
     }
 
@@ -42,7 +43,7 @@ export const deleteFrameworkAction = authActionClient
       if (!frameworkInstance) {
         return {
           success: false,
-          error: 'Framework instance not found',
+          error: msg('Framework instance not found'),
         };
       }
 
@@ -62,7 +63,7 @@ export const deleteFrameworkAction = authActionClient
       console.error(error);
       return {
         success: false,
-        error: 'Failed to delete framework instance',
+        error: msg('Failed to delete framework instance'),
       };
     }
   });

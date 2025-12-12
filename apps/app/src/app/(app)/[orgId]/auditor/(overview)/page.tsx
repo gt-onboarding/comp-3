@@ -8,6 +8,8 @@ import type { Metadata } from 'next';
 import { headers } from 'next/headers';
 import { notFound, redirect } from 'next/navigation';
 import { AuditorView } from './components/AuditorView';
+import { getGT, getMessages } from 'gt-next/server';
+import { msg } from 'gt-next';
 
 // Helper to safely parse comma-separated roles string
 function parseRolesString(rolesStr: string | null | undefined): Role[] {
@@ -19,13 +21,16 @@ function parseRolesString(rolesStr: string | null | undefined): Role[] {
 }
 
 export async function generateMetadata(): Promise<Metadata> {
+  const gt = await getGT();
   return {
-    title: 'Auditor View',
+    title: gt('Auditor View'),
   };
 }
 
 export default async function AuditorPage({ params }: { params: Promise<{ orgId: string }> }) {
   const { orgId: organizationId } = await params;
+  const gt = await getGT();
+  const m = await getMessages();
 
   const session = await auth.api.getSession({
     headers: await headers(),
@@ -75,16 +80,16 @@ export default async function AuditorPage({ params }: { params: Promise<{ orgId:
   // All context questions we need
   const CONTEXT_QUESTIONS = [
     // AI-generated sections
-    'Company Background & Overview of Operations',
-    'Types of Services Provided',
-    'Mission & Vision',
-    'System Description',
-    'Critical Vendors',
-    'Subservice Organizations',
+    msg('Company Background & Overview of Operations'),
+    msg('Types of Services Provided'),
+    msg('Mission & Vision'),
+    msg('System Description'),
+    msg('Critical Vendors'),
+    msg('Subservice Organizations'),
     // Onboarding data
-    'How many employees do you have?',
-    'Who are your C-Suite executives?',
-    'Who will sign off on the final report?',
+    msg('How many employees do you have?'),
+    msg('Who are your C-Suite executives?'),
+    msg('Who will sign off on the final report?'),
   ];
 
   // Load existing content from Context
@@ -106,7 +111,7 @@ export default async function AuditorPage({ params }: { params: Promise<{ orgId:
   let signatoryData: { fullName: string; jobTitle: string; email: string } | null = null;
 
   try {
-    const cSuiteRaw = initialContent['Who are your C-Suite executives?'];
+    const cSuiteRaw = initialContent[m(msg('Who are your C-Suite executives?'))];
     if (cSuiteRaw) {
       cSuiteData = JSON.parse(cSuiteRaw);
     }
@@ -115,7 +120,7 @@ export default async function AuditorPage({ params }: { params: Promise<{ orgId:
   }
 
   try {
-    const signatoryRaw = initialContent['Who will sign off on the final report?'];
+    const signatoryRaw = initialContent[m(msg('Who will sign off on the final report?'))];
     if (signatoryRaw) {
       signatoryData = JSON.parse(signatoryRaw);
     }
@@ -125,13 +130,13 @@ export default async function AuditorPage({ params }: { params: Promise<{ orgId:
 
   return (
     <PageWithBreadcrumb
-      breadcrumbs={[{ label: 'Auditor View', href: `/${organizationId}/auditor`, current: true }]}
+      breadcrumbs={[{ label: gt('Auditor View'), href: `/${organizationId}/auditor`, current: true }]}
     >
       <AuditorView
         initialContent={initialContent}
-        organizationName={organization?.name ?? 'Organization'}
+        organizationName={organization?.name ?? gt('Organization')}
         logoUrl={logoUrl}
-        employeeCount={initialContent['How many employees do you have?'] || null}
+        employeeCount={initialContent[m(msg('How many employees do you have?'))] || null}
         cSuite={cSuiteData}
         reportSignatory={signatoryData}
       />

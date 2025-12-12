@@ -2,6 +2,7 @@
 
 import { Button } from '@comp/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@comp/ui/select';
+import { T, Num, useGT } from 'gt-next';
 import { AlertCircle, CheckCircle2, Loader2, RefreshCw, Settings } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { FindingsTable } from './FindingsTable';
@@ -33,6 +34,7 @@ export function ResultsView({
   needsConfiguration,
   onConfigure,
 }: ResultsViewProps) {
+  const gt = useGT();
   const [selectedStatus, setSelectedStatus] = useState<string>('all');
   const [selectedSeverity, setSelectedSeverity] = useState<string>('all');
   const [scanCompleted, setScanCompleted] = useState(false);
@@ -81,17 +83,21 @@ export function ResultsView({
           <div className="flex items-start gap-3">
             <AlertCircle className="h-5 w-5 text-warning shrink-0 mt-0.5" />
             <div>
-              <p className="text-sm font-medium text-warning-foreground">Configuration Required</p>
-              <p className="text-sm text-warning-foreground/80 mt-1">
-                Please configure the required variables (like region or organization ID) to enable
-                security scans.
-              </p>
+              <T>
+                <p className="text-sm font-medium text-warning-foreground">Configuration Required</p>
+              </T>
+              <T>
+                <p className="text-sm text-warning-foreground/80 mt-1">
+                  Please configure the required variables (like region or organization ID) to enable
+                  security scans.
+                </p>
+              </T>
             </div>
           </div>
           <div className="mt-3 ml-8">
             <Button size="sm" variant="outline" onClick={onConfigure}>
               <Settings className="h-4 w-4 mr-2" />
-              Configure
+              <T>Configure</T>
             </Button>
           </div>
         </div>
@@ -101,10 +107,14 @@ export function ResultsView({
         <div className="bg-primary/10 flex items-center gap-3 rounded-lg border border-primary/20 p-4">
           <Loader2 className="text-primary h-5 w-5 animate-spin flex-shrink-0" />
           <div className="flex-1">
-            <p className="text-primary text-sm font-medium">Scanning in progress...</p>
-            <p className="text-muted-foreground text-xs">
-              Checking your cloud infrastructure for security issues
-            </p>
+            <T>
+              <p className="text-primary text-sm font-medium">Scanning in progress...</p>
+            </T>
+            <T>
+              <p className="text-muted-foreground text-xs">
+                Checking your cloud infrastructure for security issues
+              </p>
+            </T>
           </div>
         </div>
       )}
@@ -113,8 +123,12 @@ export function ResultsView({
         <div className="bg-primary/10 flex items-center gap-3 rounded-lg border border-primary/20 p-4">
           <CheckCircle2 className="text-primary h-5 w-5 flex-shrink-0" />
           <div className="flex-1">
-            <p className="text-primary text-sm font-medium">Scan completed</p>
-            <p className="text-muted-foreground text-xs">Results updated successfully</p>
+            <T>
+              <p className="text-primary text-sm font-medium">Scan completed</p>
+            </T>
+            <T>
+              <p className="text-muted-foreground text-xs">Results updated successfully</p>
+            </T>
           </div>
         </div>
       )}
@@ -124,10 +138,10 @@ export function ResultsView({
           <div className="flex flex-wrap items-center gap-2">
             <Select value={selectedSeverity} onValueChange={setSelectedSeverity}>
               <SelectTrigger className="h-9 w-[160px] rounded-lg border-dashed">
-                <SelectValue placeholder="All Severities" />
+                <SelectValue placeholder={gt('All Severities')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Severities</SelectItem>
+                <SelectItem value="all">{gt('All Severities')}</SelectItem>
                 {uniqueSeverities.map((severity) => (
                   <SelectItem key={severity} value={severity}>
                     {severity}
@@ -138,10 +152,10 @@ export function ResultsView({
 
             <Select value={selectedStatus} onValueChange={setSelectedStatus}>
               <SelectTrigger className="h-9 w-[160px] rounded-lg border-dashed">
-                <SelectValue placeholder="All Statuses" />
+                <SelectValue placeholder={gt('All Statuses')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Statuses</SelectItem>
+                <SelectItem value="all">{gt('All Statuses')}</SelectItem>
                 {uniqueStatuses.map((status) => (
                   <SelectItem key={status} value={status}>
                     {status}
@@ -151,9 +165,11 @@ export function ResultsView({
             </Select>
 
             {(selectedSeverity !== 'all' || selectedStatus !== 'all') && (
-              <p className="text-muted-foreground ml-2 text-sm">
-                {sortedFindings.length} of {findings.length} findings
-              </p>
+              <T>
+                <p className="text-muted-foreground ml-2 text-sm">
+                  <Num>{sortedFindings.length}</Num> of <Num>{findings.length}</Num> findings
+                </p>
+              </T>
             )}
           </div>
         ) : (
@@ -162,7 +178,7 @@ export function ResultsView({
 
         <Button onClick={handleRunScan} disabled={isScanning} className="gap-2 rounded-lg">
           <RefreshCw className={`h-4 w-4 ${isScanning ? 'animate-spin' : ''}`} />
-          {isScanning ? 'Scanning...' : 'Run Scan'}
+          {isScanning ? gt('Scanning...') : gt('Run Scan')}
         </Button>
       </div>
 
@@ -170,15 +186,23 @@ export function ResultsView({
         <FindingsTable findings={sortedFindings} />
       ) : findings.length > 0 ? (
         <div className="text-muted-foreground rounded-xs border p-12 text-center">
-          <p className="text-lg">No findings match the selected filters</p>
-          <p className="mt-2 text-sm">Try adjusting your filters</p>
+          <T>
+            <p className="text-lg">No findings match the selected filters</p>
+          </T>
+          <T>
+            <p className="mt-2 text-sm">Try adjusting your filters</p>
+          </T>
         </div>
       ) : (
         <div className="rounded-lg border-2 border-dashed p-12 text-center">
-          <p className="text-muted-foreground text-lg">No findings yet</p>
-          <p className="text-muted-foreground mt-2 text-sm">
-            Click "Run Scan" above to check for security issues
-          </p>
+          <T>
+            <p className="text-muted-foreground text-lg">No findings yet</p>
+          </T>
+          <T>
+            <p className="text-muted-foreground mt-2 text-sm">
+              Click "Run Scan" above to check for security issues
+            </p>
+          </T>
         </div>
       )}
     </div>

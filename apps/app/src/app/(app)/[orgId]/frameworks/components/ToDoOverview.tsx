@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@comp/ui/card';
 import { ScrollArea } from '@comp/ui/scroll-area';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@comp/ui/tabs';
 import { Policy, Task } from '@db';
+import { T, useGT } from 'gt-next';
 import {
   ArrowRight,
   CheckCircle2,
@@ -42,6 +43,7 @@ export function ToDoOverview({
   organizationId: string;
   currentMember: { id: string; role: string } | null;
 }) {
+  const gt = useGT();
   const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -54,10 +56,10 @@ export function ToDoOverview({
 
   const publishPolicies = useAction(publishAllPoliciesAction, {
     onSuccess: () => {
-      toast.info('Policies published! Redirecting to policies list...');
+      toast.info(gt('Policies published! Redirecting to policies list...'));
     },
     onError: () => {
-      toast.error('Failed to publish policies.');
+      toast.error(gt('Failed to publish policies.'));
       setIsLoading(false);
     },
   });
@@ -74,7 +76,7 @@ export function ToDoOverview({
     try {
       handlePublishPolicies();
     } catch (error) {
-      toast.error('Failed to publish policies.');
+      toast.error(gt('Failed to publish policies.'));
     } finally {
       setIsLoading(false);
     }
@@ -92,7 +94,7 @@ export function ToDoOverview({
     <Card className="flex flex-col h-full">
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
-          <CardTitle className="flex items-center gap-2">{'Quick Actions'}</CardTitle>
+          <CardTitle className="flex items-center gap-2">{gt('Quick Actions')}</CardTitle>
         </div>
 
         <div className="bg-secondary/50 relative mt-2 h-1 w-full overflow-hidden rounded-full">
@@ -112,11 +114,11 @@ export function ToDoOverview({
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="policies" className="flex items-center gap-2">
               <FileText className="h-3 w-3" />
-              Policies ({remainingPolicies})
+              {gt('Policies ({count})', { count: remainingPolicies })}
             </TabsTrigger>
             <TabsTrigger value="tasks" className="flex items-center gap-2">
               <Upload className="h-3 w-3" />
-              Tasks ({remainingTasks})
+              {gt('Tasks ({count})', { count: remainingTasks })}
             </TabsTrigger>
           </TabsList>
 
@@ -130,16 +132,18 @@ export function ToDoOverview({
                   className="flex items-center gap-2 w-full"
                 >
                   <Play className="h-3 w-3" />
-                  Publish All Policies
+                  {gt('Publish All Policies')}
                 </Button>
               </div>
             )}
 
             {unpublishedPolicies.length === 0 ? (
-              <div className="flex items-center justify-center gap-2 rounded-lg bg-accent p-3">
-                <CheckCircle2 className="h-4 w-4" />
-                <span className="text-sm">All policies are published!</span>
-              </div>
+              <T>
+                <div className="flex items-center justify-center gap-2 rounded-lg bg-accent p-3">
+                  <CheckCircle2 className="h-4 w-4" />
+                  <span className="text-sm">All policies are published!</span>
+                </div>
+              </T>
             ) : (
               <div className="h-[300px]">
                 <ScrollArea className="h-full">
@@ -158,7 +162,7 @@ export function ToDoOverview({
                                 {policy.name}
                               </span>
                               <span className="text-xs text-muted-foreground capitalize">
-                                Status: {formatStatus(policy.status)}
+                                {gt('Status: {status}', { status: formatStatus(policy.status) })}
                               </span>
                             </div>
                           </div>
@@ -181,10 +185,12 @@ export function ToDoOverview({
 
           <TabsContent value="tasks" className="mt-4">
             {incompleteTasks.length === 0 ? (
-              <div className="flex items-center justify-center gap-2 rounded-lg bg-accent p-3">
-                <CheckCircle2 className="h-4 w-4 text-primary" />
-                <span className="text-sm text-primary">All tasks are completed!</span>
-              </div>
+              <T>
+                <div className="flex items-center justify-center gap-2 rounded-lg bg-accent p-3">
+                  <CheckCircle2 className="h-4 w-4 text-primary" />
+                  <span className="text-sm text-primary">All tasks are completed!</span>
+                </div>
+              </T>
             ) : (
               <div className="h-[300px]">
                 <ScrollArea className="h-full">
@@ -201,7 +207,7 @@ export function ToDoOverview({
                                 {task.title}
                               </span>
                               <span className="text-xs text-muted-foreground capitalize">
-                                Status: {formatStatus(task.status)}
+                                {gt('Status: {status}', { status: formatStatus(task.status) })}
                               </span>
                             </div>
                           </div>
@@ -228,10 +234,12 @@ export function ToDoOverview({
         isOpen={isConfirmDialogOpen}
         onClose={() => setIsConfirmDialogOpen(false)}
         onConfirm={handleConfirmAction}
-        title="Are you sure you want to publish all policies?"
-        description="This will automatically publish all policies that are in draft status. This action cannot be undone."
-        confirmText="Publish Policies"
-        cancelText="Cancel"
+        title={gt('Are you sure you want to publish all policies?')}
+        description={gt(
+          'This will automatically publish all policies that are in draft status. This action cannot be undone.'
+        )}
+        confirmText={gt('Publish Policies')}
+        cancelText={gt('Cancel')}
         isLoading={isLoading}
       />
     </Card>
