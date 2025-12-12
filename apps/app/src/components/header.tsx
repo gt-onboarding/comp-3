@@ -8,6 +8,7 @@ import { Suspense } from 'react';
 import { AssistantButton } from './ai/chat-button';
 import { MobileMenu } from './mobile-menu';
 import { NotificationBell } from './notifications/notification-bell';
+import { LocaleSelector } from 'gt-next';
 
 export async function Header({
   organizationId,
@@ -42,8 +43,9 @@ export async function Header({
 
       {!hideChat && <AssistantButton />}
 
-      <div className="ml-auto mr-2 flex items-center">
+      <div className="ml-auto mr-2 flex items-center gap-2">
         <NotificationBell />
+        <LocaleSelector />
       </div>
       <div className="flex items-center space-x-2">
         <Suspense fallback={<Skeleton className="h-8 w-8 rounded-full" />}>
