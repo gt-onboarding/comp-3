@@ -2,6 +2,7 @@
 
 import { auth } from '@/utils/auth';
 import { db } from '@db';
+import { getGT } from 'gt-next/server';
 import { headers } from 'next/headers';
 
 export interface ControlProgressResponse {
@@ -17,13 +18,14 @@ export interface ControlProgressResponse {
 }
 
 export const getOrganizationControlProgress = async (controlId: string) => {
+  const gt = await getGT();
   const session = await auth.api.getSession({
     headers: await headers(),
   });
 
   if (!session) {
     return {
-      error: 'Unauthorized',
+      error: gt('Unauthorized'),
     };
   }
 
@@ -31,7 +33,7 @@ export const getOrganizationControlProgress = async (controlId: string) => {
 
   if (!orgId) {
     return {
-      error: 'Unauthorized',
+      error: gt('Unauthorized'),
     };
   }
 
@@ -48,7 +50,7 @@ export const getOrganizationControlProgress = async (controlId: string) => {
 
   if (!control) {
     return {
-      error: 'Control not found',
+      error: gt('Control not found'),
     };
   }
 

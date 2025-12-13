@@ -1,8 +1,12 @@
+'use client';
+
 import { CardContent, CardHeader, CardTitle } from '@comp/ui/card';
 
 import { Card } from '@comp/ui/card';
+import { useGT } from 'gt-next';
 
 export const SingleControlSkeleton = () => {
+  const gt = useGT();
   return (
     <div className="mx-auto max-w-[1200px]">
       <div className="space-y-8">
@@ -17,7 +21,7 @@ export const SingleControlSkeleton = () => {
           </Card>
           <Card>
             <CardHeader>
-              <CardTitle>Domain</CardTitle>
+              <CardTitle>{gt('Domain')}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="bg-muted h-4 w-1/2 animate-pulse rounded-sm" />

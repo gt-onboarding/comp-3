@@ -2,6 +2,7 @@
 
 import { authActionClient } from '@/actions/safe-action';
 import { db } from '@db';
+import { getGT } from 'gt-next/server';
 import { revalidatePath, revalidateTag } from 'next/cache';
 import { z } from 'zod';
 
@@ -23,11 +24,12 @@ export const deleteControlAction = authActionClient
   .action(async ({ parsedInput, ctx }) => {
     const { id } = parsedInput;
     const { activeOrganizationId } = ctx.session;
+    const gt = await getGT();
 
     if (!activeOrganizationId) {
       return {
         success: false,
-        error: 'Not authorized',
+        error: gt('Not authorized'),
       };
     }
 
@@ -42,7 +44,7 @@ export const deleteControlAction = authActionClient
       if (!control) {
         return {
           success: false,
-          error: 'Control not found',
+          error: gt('Control not found'),
         };
       }
 
@@ -63,7 +65,7 @@ export const deleteControlAction = authActionClient
       console.error(error);
       return {
         success: false,
-        error: 'Failed to delete control',
+        error: gt('Failed to delete control'),
       };
     }
   });
